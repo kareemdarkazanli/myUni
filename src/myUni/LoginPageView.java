@@ -108,8 +108,8 @@ public class LoginPageView extends JFrame implements ActionListener, ChangeListe
 
 			passwordField.selectAll();
 		} else { //The user wants to sign up.
-			JOptionPane.showMessageDialog(controllingFrame,
-					"maybe we'll have a sign up page here, maybe not lol");
+			new CreateAccountPageView();
+			this.dispose();
 		}
 	}
 	/**
