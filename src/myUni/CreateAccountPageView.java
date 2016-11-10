@@ -8,10 +8,7 @@ import java.util.Arrays;
 
 public class CreateAccountPageView {
 
-    public static void main(String[] args) {
 
-        new CreateAccountPageView();
-    }
 
     public CreateAccountPageView()
     {
