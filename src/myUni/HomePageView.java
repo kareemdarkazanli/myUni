@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class HomePageView {
+public class HomePageView extends JFrame{
 	
 	public HomePageView(){
 		
@@ -81,11 +81,11 @@ public class HomePageView {
 		filterPanel.add(Box.createVerticalGlue());	
 		
 		
-		JFrame frame = new JFrame();
-	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    frame.add(filterPanel, BorderLayout.EAST);
-	    frame.setSize(500, 300); 
-	    frame.setVisible(true);
+		
+	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    this.add(filterPanel, BorderLayout.EAST);
+	    this.setSize(500, 300); 
+	    this.setVisible(true);
 		
 	}
 	

@@ -7,8 +7,9 @@ import java.sql.SQLException;
 public class Main {
 	
 	public static void main(String[] args){
-	
-		new HomePageView();
+		LoginPageModel newModel = new LoginPageModel();
+		LoginPageView loginPage = new LoginPageView(newModel);
+		newModel.attach(loginPage);
 	}
 
 }
