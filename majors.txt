@@ -1,0 +1,15 @@
+SJSU	CS	3.5
+SJSU	EE	3.3
+SJSU	Physics	3.0
+SFSU	CS	3.3
+SFSU	EE	3.2
+SFSU	Physics	3.2
+CSUEB	CS	3.0
+CSUEB	EE	3.0
+CSUEB	Physics	2.9
+WSU	CS	3.1
+WSU	EE	2.8
+WSU	Physics	2.7
+OSU	CS	3.4
+OSU	EE	3.4
+OSU	Physics	3.4

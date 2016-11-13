@@ -96,7 +96,7 @@ public class CreateAccountPageView {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                new LoginPageView(new LoginPageModel());
+                new LoginPageView(new MySQLConnect());
             }
         });
 

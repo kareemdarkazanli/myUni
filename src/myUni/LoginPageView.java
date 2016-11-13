@@ -9,27 +9,28 @@ import javax.swing.event.ChangeListener;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 public class LoginPageView extends JFrame implements ActionListener, ChangeListener{
 
-	private JTextField emailField;
+	private JTextField nameField;
 	private JPasswordField passwordField;
-	private LoginPageModel theModel;
+	private MySQLConnect theModel;
 	private JFrame controllingFrame;
 	
 	/**
-	 * LoginPageView has an instance of the model and a containing JFrame
+	 * LoginPageView has an instance of the model
 	 */
-	public LoginPageView(LoginPageModel model){
+	public LoginPageView(MySQLConnect model){
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		theModel = model;
-		emailField = new JTextField("", 10); 
+		nameField = new JTextField("", 10); 
 		passwordField = new JPasswordField("", 10); 
 		passwordField.setActionCommand("Login");
 		passwordField.addActionListener(this);
 
-		JLabel emailLabel = new JLabel("Enter your student email: ");
-		JLabel passwordLabel = new JLabel("Enter the password: ");
+		JLabel emailLabel = new JLabel("Username: ");
+		JLabel passwordLabel = new JLabel("Password: ");
 		passwordLabel.setLabelFor(passwordField);
 
 		JComponent buttonPane = createButtonPanel();
@@ -37,7 +38,7 @@ public class LoginPageView extends JFrame implements ActionListener, ChangeListe
 		//Lay out everything.
 		JPanel textPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 		textPane.add(emailLabel);
-		textPane.add(emailField);
+		textPane.add(nameField);
 		textPane.add(passwordLabel);
 		textPane.add(passwordField);
 		JPanel surrounding = new JPanel();
@@ -50,11 +51,11 @@ public class LoginPageView extends JFrame implements ActionListener, ChangeListe
 	}
 
 	/**
-	 * Gets the user input email
+	 * Gets the user input name
 	 */
-	public String getEmail()
+	public String getUserName()
 	{
-		return emailField.getText();
+		return nameField.getText();
 	}
 	/**
 	 * Gets the user input password
@@ -84,26 +85,35 @@ public class LoginPageView extends JFrame implements ActionListener, ChangeListe
 		return p;
 	}
 /**
- * Authenticates the user based on input actions, or redirects to the sign in page if we decide to implement it
+ * Authenticates the user based on input actions, or redirects to the sign in page if the user wants to create a Student Account
  */
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
 
 		if ("Login".equals(cmd)) { //Process the password.
 			String inputPassword = getPassword();
-			String inputEmail = getEmail();
-			if (theModel.areEmailAndPasswordCorrect(inputPassword, inputEmail)) {
-				JOptionPane.showMessageDialog(controllingFrame,
-						"Success! the program will redirect to the home page");
-				new HomePageView().setVisible(true); //new instance of a home page view here
+			String inputName = getUserName();
+			try {
+				if (theModel.areEmailAndPasswordCorrect(inputPassword, inputName)) {
+					JOptionPane.showMessageDialog(controllingFrame,
+							"Success! the program will redirect to the home page");
+					int loggedInStudentID = theModel.getStudentID(inputPassword, inputName);
+					new HomePageView(loggedInStudentID).setVisible(true); //new instance of a home page view here
 
-		        this.dispose(); //to close the current frame
-			} else {
-				JOptionPane.showMessageDialog(controllingFrame,
-						"Invalid password or email. Try again.",
-						
-						"Error Message",
-						JOptionPane.ERROR_MESSAGE);
+				    this.dispose(); //to close the current frame
+				} else {
+					JOptionPane.showMessageDialog(controllingFrame,
+							"Invalid password or email. Try again.",
+							
+							"Error Message",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			} catch (HeadlessException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
 			passwordField.selectAll();

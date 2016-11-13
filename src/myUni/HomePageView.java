@@ -5,9 +5,9 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class HomePageView extends JFrame{
-	
-	public HomePageView(){
-		
+	private int loggedInStudentID; //the sID of the student that has successfully logged in
+	public HomePageView(int loggedInStudentID){
+		this.loggedInStudentID = loggedInStudentID;
 		HomePageController controller = new HomePageController();
 		
 		String[] petStrings = { "Bird", "Cat", "Dog", "Rabbit", "Pig" };
