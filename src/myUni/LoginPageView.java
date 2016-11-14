@@ -94,12 +94,12 @@ public class LoginPageView extends JFrame implements ActionListener, ChangeListe
 			String inputPassword = getPassword();
 			String inputName = getUserName();
 			try {
-				if (theModel.areEmailAndPasswordCorrect(inputPassword, inputName)) {
+				if (theModel.areEmailAndPasswordCorrect(inputName, inputPassword)) {
+					int loggedInStudentID = theModel.getStudentID(inputName, inputPassword);
+					String loggedInStudentName = theModel.getStudentName(loggedInStudentID);
 					JOptionPane.showMessageDialog(controllingFrame,
-							"Success! the program will redirect to the home page");
-					int loggedInStudentID = theModel.getStudentID(inputPassword, inputName);
+							"Success! Now logged in as " + loggedInStudentName + ". Your ID number is: " + loggedInStudentID);
 					new HomePageView(loggedInStudentID).setVisible(true); //new instance of a home page view here
-
 				    this.dispose(); //to close the current frame
 				} else {
 					JOptionPane.showMessageDialog(controllingFrame,
@@ -118,7 +118,7 @@ public class LoginPageView extends JFrame implements ActionListener, ChangeListe
 
 			passwordField.selectAll();
 		} else { //The user wants to sign up.
-			new CreateAccountPageView();
+			new CreateAccountPageView(theModel);
 			this.dispose();
 		}
 	}

@@ -8,8 +8,8 @@ public class Main {
 	
 	public static void main(String[] args) throws SQLException{
 		MySQLConnect newModel = new MySQLConnect();
-		LoginPageView loginPage = new LoginPageView(newModel);
 		MySQLConnect.setUpData();
+		LoginPageView loginPage = new LoginPageView(newModel);
 	}
 
 }

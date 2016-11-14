@@ -4,13 +4,14 @@ package myUni;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 public class CreateAccountPageView {
 
 
 
-    public CreateAccountPageView()
+    public CreateAccountPageView(MySQLConnect theModel)
     {
         //TODO DELETE THIS DUMMY DATA
         String dummyUsernames[] = {"admin", "Bob", "Frank"};
@@ -78,16 +79,25 @@ public class CreateAccountPageView {
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Arrays.asList(dummyUsernames).contains(usernameText.getText())){
-                    response.setText("Error: Username already exists");
+                try {
+                    if (theModel.isUsernameUnique(usernameText.getText())) {
+                        response.setText("Error: Username already exists");
+                    } else if (!Arrays.equals(passwordText.getPassword(), confirmPasswordText.getPassword())) {
+                        response.setText("Error: Passwords do not match");
+                    } else if (Arrays.equals(passwordText.getPassword(), confirmPasswordText.getPassword())) {
+                        theModel.createNewAccount(usernameText.getText(), String.valueOf(passwordText.getPassword()));
+                        response.setText("Success!");
+                        int loggedInStudentID = theModel.getStudentID(usernameText.getText(), String.copyValueOf(passwordText.getPassword()));
+    					String loggedInStudentName = theModel.getStudentName(loggedInStudentID);
+    					JOptionPane.showMessageDialog(frame,
+    							"Success! Created account for " + loggedInStudentName + ". Your ID number is: " + loggedInStudentID);
+                        frame.dispose();
+                        new LoginPageView(theModel);
+                    } else response.setText("Error!");
                 }
-                else if (!Arrays.equals(passwordText.getPassword(), confirmPasswordText.getPassword())) {
-                    response.setText("Error: Passwords do not match");
+                catch (SQLException e1){
+                    e1.printStackTrace();
                 }
-                else if (Arrays.equals(passwordText.getPassword(), confirmPasswordText.getPassword())){
-                    response.setText("Success!");
-                }
-                else response.setText("Error!");
             }
         });
 
@@ -96,7 +106,7 @@ public class CreateAccountPageView {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                new LoginPageView(new MySQLConnect());
+                new LoginPageView(theModel);
             }
         });
 

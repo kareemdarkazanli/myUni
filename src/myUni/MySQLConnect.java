@@ -1,5 +1,7 @@
 package myUni;
 import java.sql.*;
+import java.util.ArrayList;
+
 /**
  * Sets up the SQL connection and supplies various methods to fetch data from the database
  * code template modified from JDBCCallableStatement class example
@@ -178,7 +180,7 @@ public class MySQLConnect {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public boolean areEmailAndPasswordCorrect(String inputPassword, String inputName) throws SQLException {
+	public boolean areEmailAndPasswordCorrect(String inputName, String inputPassword) throws SQLException {
 		String sql = null;
 		ResultSet rs = null;
 
@@ -208,7 +210,7 @@ public class MySQLConnect {
 		ResultSet rs = null;
 
 		sql = "SELECT sID from student where sName = ? and password = ?";
-		preparedStatement= conn.prepareStatement(sql);
+		preparedStatement = conn.prepareStatement(sql);
 		preparedStatement.setString(1, sName);
 		preparedStatement.setString(2, password);
 		rs = preparedStatement.executeQuery();
@@ -217,6 +219,27 @@ public class MySQLConnect {
 			sID = rs.getInt("sID");
 		}
 		return sID;
+	}
+	/**
+	 * Retrieves the student's name from their sID
+	 * @param sID the student's ID
+	 * @return the student's name
+	 * @throws SQLException 
+	 */
+	public String getStudentName(int inputID) throws SQLException
+	{
+		String sql = null;
+		ResultSet rs = null;
+
+		sql = "SELECT sName from student where sID = ?";
+		preparedStatement= conn.prepareStatement(sql);
+		preparedStatement.setInt(1, inputID);
+		rs = preparedStatement.executeQuery();
+		String sName = "";
+		if (rs.next()) {
+			sName = rs.getString("sName");
+		}
+		return sName;
 	}
 
 	/**
@@ -228,5 +251,45 @@ public class MySQLConnect {
 		createDatabase();
 		createTables();
 		loadDataIntoTables();
+	}
+
+
+	/**
+	 * Checks to see if the username entered is unique
+	 * @param userName
+	 * @return
+	 * @throws SQLException
+	 */
+	public boolean isUsernameUnique(String username) throws SQLException{
+		String sql = null;
+		ResultSet rs = null;
+
+		sql = "SELECT sName from student";
+		preparedStatement= conn.prepareStatement(sql);
+		rs = preparedStatement.executeQuery();
+		ArrayList<String> a = new ArrayList<String>();
+		while (rs.next()) {
+			a.add(rs.getString(1));
+		}
+		if (a.contains(username)) return true;
+		else return false;
+	}
+
+	/**
+	 * Enters the username and password into the database on a successful creation
+	 * @param username
+	 * @param password
+	 * @throws SQLException
+	 */
+	//TODO Add in GPA?
+	public void createNewAccount(String username, String password) throws SQLException{
+		String sql = null;
+		ResultSet rs = null;
+
+		sql = "INSERT INTO student(sname, password) VALUES (?,?)";
+		preparedStatement= conn.prepareStatement(sql);
+		preparedStatement.setString(1, username);
+		preparedStatement.setString(2, password);
+		preparedStatement.executeUpdate();
 	}
 }
