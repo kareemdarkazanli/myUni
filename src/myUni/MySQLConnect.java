@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class MySQLConnect {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	static final String DB_URL = "jdbc:mysql://localhost/";
+	static final String DB_URL = "jdbc:mysql:///127.0.0.1/";
 
 	//  Database credentials
 	static final String USER = "root";
@@ -23,8 +23,13 @@ public class MySQLConnect {
 
 		// Open a connection
 		System.out.println("Connecting to database...");
-		conn = DriverManager.getConnection(DB_URL, USER, PASS);
-
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
 		String queryDrop = "DROP SCHEMA IF EXISTS ApplyToCollege";
 		Statement stmtDrop = conn.createStatement();
 		stmtDrop.execute(queryDrop);
@@ -48,7 +53,7 @@ public class MySQLConnect {
 		// Open a connection and select the database 
 
 		System.out.println("Connecting to database...");
-		conn = DriverManager.getConnection(DB_URL+"ApplyToCollege", USER, PASS);
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
 		statement = conn.createStatement();
 
 		String queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.College";
@@ -292,4 +297,75 @@ public class MySQLConnect {
 		preparedStatement.setString(2, password);
 		preparedStatement.executeUpdate();
 	}
+	
+	//Create method that gets all states
+		public ArrayList<String> getAllStates(){
+			//Create query that gets all states
+			ArrayList<String> states = new ArrayList<String>();
+
+			try{
+				Statement myStmt = conn.createStatement();
+
+				String sql = "SELECT state " +
+		                   	 "FROM College "+
+		                   	 "GROUP BY state"; 
+				ResultSet s = myStmt.executeQuery(sql);
+				while (s.next()) {
+				    states.add(s.getString(1));
+				}   
+			}catch(Exception e){
+				
+			}
+			return states;
+		}
+		
+		//Create method that gets all colleges from a specific state
+		public ArrayList<String> getAllColleges(String state){
+			//Create query that gets all colleges from state
+			ArrayList<String> colleges = new ArrayList<String>();
+			
+			try {
+				Statement myStmt = conn.createStatement();
+				String sql = "SELECT cName " +
+	                  	 "FROM College c "+
+	                  	 "WHERE c.state = '" + state + "'"; 
+				ResultSet s = myStmt.executeQuery(sql);
+				while (s.next()) {
+				    colleges.add(s.getString(1));
+				}   
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return colleges;
+		}
+		
+		//Create method that gets all majors from a specific college
+		public ArrayList<String> getAllMajors(String college){
+			
+			//Create query that gets all colleges from state
+			ArrayList<String> majors = new ArrayList<String>();
+					
+			try {
+				Statement myStmt = conn.createStatement();
+				String sql = "SELECT major " +
+	                  	 "FROM Major m "+
+	                  	 "WHERE m.cName = '" +  college + "'"; 
+				ResultSet s = myStmt.executeQuery(sql);
+				while (s.next()) {
+				    majors.add(s.getString(1));
+				}   
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return majors;
+		}
+		
+		//Create a method that applies for a specific major in a college
+		public boolean apply(int sID, String college, String major){
+			//Create a query that inserts into Apply
+			return false;
+		}
+		
 }

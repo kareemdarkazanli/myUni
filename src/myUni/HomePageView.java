@@ -2,6 +2,8 @@ package myUni;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
 public class HomePageView extends JFrame{
@@ -10,41 +12,69 @@ public class HomePageView extends JFrame{
 		this.loggedInStudentID = loggedInStudentID;
 		HomePageController controller = new HomePageController();
 		
-		String[] petStrings = { "Bird", "Cat", "Dog", "Rabbit", "Pig" };
 
 		//Create 3 comboboxes for the filters
-		
+		ArrayList<String> states = controller.getAllStates();
+		String[] statesArray = new String[states.size()];
+		statesArray = states.toArray(statesArray);
+		ArrayList<String> colleges = controller.getAllColleges(states.get(0));
+		String[] collegesArray = new String[colleges.size()];
+		collegesArray = colleges.toArray(collegesArray);
+		ArrayList<String> majors = controller.getAllMajors(colleges.get(0));
+		String[] majorsArray = new String[majors.size()];
+		majorsArray = majors.toArray(majorsArray);
 		
 		//retrieve all states from home controller
 		//retrieve all college from a specific state from home controller
 		//retrieve all majors from a specific college from home controller
-		JComboBox stateComboBox = new JComboBox(petStrings);
-		JComboBox collegeComboBox = new JComboBox(petStrings);
-		JComboBox majorComboBox = new JComboBox(petStrings);
+		JComboBox stateComboBox = new JComboBox(statesArray);
+		JComboBox collegeComboBox = new JComboBox(collegesArray);
+		JComboBox majorComboBox = new JComboBox(majorsArray);
 		
 		
 		stateComboBox.addActionListener(new ActionListener() { 
 			  public void actionPerformed(ActionEvent e) { 
-				  //retrieve all colleges from a specific state from home controller
-				  //Select the first college in the list
-				  //Repopulate collegeComboBox with first college selected
-				  //Retrieve all majors of that first college
-				  //Select the first major in the list
-				  //Repopulate majors with the first major selected
+				 
 				  String state = stateComboBox.getSelectedItem().toString();
-				  System.out.println(state);
-				  collegeComboBox.addItem("StateSelected");
+				  collegeComboBox.removeAllItems();
+				  ArrayList<String> colleges = controller.getAllColleges(state);
+				  for(String college: colleges){
+					  collegeComboBox.addItem(college);
+				  }
+				  String college = colleges.get(0);
+				  majorComboBox.removeAllItems();
+				  ArrayList<String> majors = controller.getAllMajors(college);
+				  for(String major: majors){
+					  majorComboBox.addItem(major);
+				  }
+				  invalidate();
+				  validate();
+				  repaint();
 				  } 
 				});
 		
 		collegeComboBox.addActionListener(new ActionListener() { 
 			  public void actionPerformed(ActionEvent e) {
-				  //Retrieve all majors of the selected college
-				  //Select the first major in the list
-				  //Repopulate majors with the first major selected
-				  String college = collegeComboBox.getSelectedItem().toString();
-				  } 
+				  if(collegeComboBox.getSelectedItem() == null){
+					  
+				  }
+				  else{
+					  String college = collegeComboBox.getSelectedItem().toString();
+					  majorComboBox.removeAllItems();
+					  ArrayList<String> majors = controller.getAllMajors(college);
+					  for(String major: majors){
+						  majorComboBox.addItem(major);
+					  }
+					  invalidate();
+					  validate();
+					  repaint();
+					  } 
+				  }
+				 
+				   
 				});
+		
+		
 		
 		
 		//Button panel with apply and view buttons

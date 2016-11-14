@@ -2,6 +2,8 @@ package myUni;
 
 import java.util.ArrayList;
 
+
+//DUE FOR DELETION
 public class HomePageModel {
 	
 	//Have instance of MySQLConnect
