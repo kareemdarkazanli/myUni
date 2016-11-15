@@ -285,15 +285,15 @@ public class MySQLConnect {
 	 * @param password
 	 * @throws SQLException
 	 */
-	//TODO Add in GPA?
-	public void createNewAccount(String username, String password) throws SQLException{
+	public void createNewAccount(String username, String password, String gpa) throws SQLException{
 		String sql = null;
 		ResultSet rs = null;
 
-		sql = "INSERT INTO student(sname, password) VALUES (?,?)";
+		sql = "INSERT INTO student(sname, password, GPA) VALUES (?,?,?)";
 		preparedStatement= conn.prepareStatement(sql);
 		preparedStatement.setString(1, username);
 		preparedStatement.setString(2, password);
+		preparedStatement.setFloat(3, Float.parseFloat(gpa));
 		preparedStatement.executeUpdate();
 	}
 	

@@ -1,6 +1,8 @@
 package myUni;
 
 
+import com.mysql.jdbc.StringUtils;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,8 +15,6 @@ public class CreateAccountPageView {
 
     public CreateAccountPageView(MySQLConnect theModel)
     {
-        //TODO DELETE THIS DUMMY DATA
-        String dummyUsernames[] = {"admin", "Bob", "Frank"};
 
         JFrame frame = new JFrame();
 
@@ -59,19 +59,29 @@ public class CreateAccountPageView {
         confirmPasswordText.setBounds(150, 70, 160, 25);
         panel.add(confirmPasswordText);
 
+        // GPA Label
+        JLabel gpa = new JLabel("Enter GPA*");
+        gpa.setBounds(50, 100, 150, 25);
+        panel.add(gpa);
+
+        // GPA Text Field
+        JTextField gpaField = new JTextField(20);
+        gpaField.setBounds(150, 100, 50, 25);
+        panel.add(gpaField);
+
         // Create Button
         JButton createButton = new JButton("Create");
-        createButton.setBounds(70, 100, 80, 30);
+        createButton.setBounds(70, 130, 80, 30);
         panel.add(createButton);
 
         // Cancel Button
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.setBounds(190, 100, 80, 30);
+        cancelButton.setBounds(190, 130, 80, 30);
         panel.add(cancelButton);
 
         // Response text
         JLabel response = new JLabel("");
-        response.setBounds(0, 120, 350, 50);
+        response.setBounds(0, 150, 350, 50);
         response.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(response);
 
@@ -84,8 +94,10 @@ public class CreateAccountPageView {
                         response.setText("Error: Username already exists");
                     } else if (!Arrays.equals(passwordText.getPassword(), confirmPasswordText.getPassword())) {
                         response.setText("Error: Passwords do not match");
+                    } else if (StringUtils.isNullOrEmpty(gpaField.getText())){
+                        response.setText("Error: GPA is not valid");
                     } else if (Arrays.equals(passwordText.getPassword(), confirmPasswordText.getPassword())) {
-                        theModel.createNewAccount(usernameText.getText(), String.valueOf(passwordText.getPassword()));
+                        theModel.createNewAccount(usernameText.getText(), String.valueOf(passwordText.getPassword()), gpaField.getText());
                         response.setText("Success!");
                         int loggedInStudentID = theModel.getStudentID(usernameText.getText(), String.copyValueOf(passwordText.getPassword()));
     					String loggedInStudentName = theModel.getStudentName(loggedInStudentID);
@@ -97,6 +109,9 @@ public class CreateAccountPageView {
                 }
                 catch (SQLException e1){
                     e1.printStackTrace();
+                }
+                catch (NumberFormatException e2){
+                    response.setText("Error: GPA is not valid");
                 }
             }
         });
