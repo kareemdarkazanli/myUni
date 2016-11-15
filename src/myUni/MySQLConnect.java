@@ -127,9 +127,29 @@ public class MySQLConnect {
 				+ "FOREIGN KEY cName_foreign_key(cName, major) REFERENCES `ApplyToCollege`.`Major` (cName, major) ON DELETE CASCADE ON UPDATE CASCADE)";
 		statement.execute(createTableSQL); 
 		System.out.println("Table called Apply created successfully...");
-			         String dropTrigger = "DROP TRIGGER IF EXISTS acceptance";
-			         stmtDrop.execute(dropTrigger);
-			         
+
+		String dropTrigger = "DROP TRIGGER IF EXISTS acceptance";
+		stmtDrop.execute(dropTrigger);
+		String acceptTrigger = "CREATE TRIGGER acceptance "
+				+ "BEFORE INSERT ON Apply "
+				+ "FOR EACH ROW "
+				+ "BEGIN "
+				+ "IF ( (select gpa from student where student.sID = NEW.sID) "
+				+ "    >= (select GPAREQ from major "
+				+ "where major.cName = NEW.cName "
+				+ "AND major.major = NEW.major "
+				+ "        ) "
+				+ "    ) "
+				+ "THEN "
+				+ "set NEW.accept = TRUE; "
+				+ "ELSE "
+				+ "set NEW.accept = FALSE; "
+				+ "END IF; "
+				+ "END; ";
+
+		pState = conn.prepareStatement(acceptTrigger);
+		pState.executeUpdate();
+		System.out.println("Accept trigger created successfully");
 
 
 	}
