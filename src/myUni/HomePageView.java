@@ -92,7 +92,7 @@ public class HomePageView extends JFrame{
 		JButton viewButton = new JButton("View");
 		viewButton.addActionListener(new ActionListener() { 
 			  public void actionPerformed(ActionEvent e) { 
-				  new InformationPageView(collegeComboBox.getSelectedItem().toString(), stateComboBox.getSelectedItem().toString(), majorComboBox.getSelectedItem().toString());
+				  
 			  } 
 			});
 		
