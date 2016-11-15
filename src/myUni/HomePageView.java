@@ -10,6 +10,8 @@ public class HomePageView extends JFrame{
 	private int loggedInStudentID; //the sID of the student that has successfully logged in
 	public HomePageView(int loggedInStudentID){
 		this.loggedInStudentID = loggedInStudentID;
+		
+		
 		HomePageController controller = new HomePageController();
 		
 
