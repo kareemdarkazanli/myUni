@@ -71,13 +71,31 @@ public class HomePageView extends JFrame{
 					  validate();
 					  repaint();
 					  } 
-				  }
-				 
-				   
+				  }	   
 				});
 		
 		
 		
+		JButton collegeApplicationsButton = new JButton("College Applications");
+		collegeApplicationsButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new CollegeApplicationsView(loggedInStudentID);
+			}
+			
+		});
+		
+		JButton logoutButton = new JButton("Logout");
+		logoutButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 		
 		//Button panel with apply and view buttons
 		JButton applyButton = new JButton("Apply");
@@ -114,9 +132,17 @@ public class HomePageView extends JFrame{
 		filterPanel.add(Box.createVerticalGlue());	
 		
 		
+		JPanel optionsPanel = new JPanel();
+		optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+		optionsPanel.add(logoutButton);
+		optionsPanel.add(collegeApplicationsButton);
+		optionsPanel.add(Box.createVerticalGlue());	
+		
+		
 		
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    this.add(filterPanel, BorderLayout.EAST);
+	    this.add(optionsPanel, BorderLayout.WEST);
 	    this.setSize(500, 300); 
 	    this.setVisible(true);
 		

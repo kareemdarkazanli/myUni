@@ -361,6 +361,44 @@ public class MySQLConnect {
 			return majors;
 		}
 		
+		public void deleteCollegeApplication(int sID, String cName, String major){
+			//Create a query that inserts into Apply
+			Statement myStmt;
+			try {
+				myStmt = conn.createStatement();
+				
+				//CHANGE TO SQL
+				String sql = "DELETE FROM Apply WHERE sID = "+ sID + " AND cName = '"+ cName + "' AND major = '"+ major + "';";			
+				 myStmt.executeUpdate(sql);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		public ArrayList<String> getCollegeApplications(int sID){
+			//Create a query that inserts into Apply
+			ArrayList<String> collegeApplications = new ArrayList<String>();
+			try {
+				Statement myStmt = conn.createStatement();
+				String sql = "SELECT cName, major, accept " +
+	                  	 "FROM Apply a "+
+	                  	 "WHERE a.sID = '" +  sID + "'"; 
+				ResultSet s = myStmt.executeQuery(sql);
+				while (s.next()) {
+					String accepted = "Accepted";
+					if(s.getString(3).equals("0"))
+						accepted = "Not Accepted";
+				    collegeApplications.add(s.getString(1) + "		" + s.getString(2) + "		" + accepted);
+				}   
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return collegeApplications;
+		}
+		
 		//Create a method that applies for a specific major in a college
 		public boolean apply(int sID, String college, String major){
 			//Create a query that inserts into Apply

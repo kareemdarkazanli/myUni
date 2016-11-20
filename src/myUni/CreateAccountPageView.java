@@ -1,9 +1,11 @@
 package myUni;
 
+import java.awt.*;
+
+import javax.swing.*;
 
 import com.mysql.jdbc.StringUtils;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -94,7 +96,7 @@ public class CreateAccountPageView {
                         response.setText("Error: Username already exists");
                     } else if (!Arrays.equals(passwordText.getPassword(), confirmPasswordText.getPassword())) {
                         response.setText("Error: Passwords do not match");
-                    } else if (StringUtils.isNullOrEmpty(gpaField.getText())){
+                    } else if (gpaField.getText().toString().trim().length() == 0){
                         response.setText("Error: GPA is not valid");
                     } else if (Arrays.equals(passwordText.getPassword(), confirmPasswordText.getPassword())) {
                         theModel.createNewAccount(usernameText.getText(), String.valueOf(passwordText.getPassword()), gpaField.getText());
