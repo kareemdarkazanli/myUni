@@ -86,6 +86,7 @@ public class HomePageView extends JFrame{
 				  String state = stateComboBox.getSelectedItem().toString();
 				  String college = collegeComboBox.getSelectedItem().toString();
 				  String major = majorComboBox.getSelectedItem().toString();
+				  controller.apply(loggedInStudentID, college, major);
 				  } 
 				});
 		

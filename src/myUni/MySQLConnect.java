@@ -29,7 +29,7 @@ public class MySQLConnect {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "81640041Kd");
 		String queryDrop = "DROP SCHEMA IF EXISTS ApplyToCollege";
 		Statement stmtDrop = conn.createStatement();
 		stmtDrop.execute(queryDrop);
@@ -53,7 +53,7 @@ public class MySQLConnect {
 		// Open a connection and select the database 
 
 		System.out.println("Connecting to database...");
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "81640041Kd");
 		statement = conn.createStatement();
 
 		String queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.College";
@@ -364,6 +364,20 @@ public class MySQLConnect {
 		//Create a method that applies for a specific major in a college
 		public boolean apply(int sID, String college, String major){
 			//Create a query that inserts into Apply
+			Statement myStmt;
+			try {
+				myStmt = conn.createStatement();
+				
+				//CHANGE TO SQL
+				String sql = "INSERT INTO APPLY(sID, cName, major) " +
+	                  	 "VALUES (" + sID +", '" + college +"', '" + major + "');"; 
+				
+				 myStmt.executeUpdate(sql);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			return false;
 		}
 		
