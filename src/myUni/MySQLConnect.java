@@ -29,7 +29,7 @@ public class MySQLConnect {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "81640041Kd");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
 		String queryDrop = "DROP SCHEMA IF EXISTS ApplyToCollege";
 		Statement stmtDrop = conn.createStatement();
 		stmtDrop.execute(queryDrop);
@@ -53,7 +53,7 @@ public class MySQLConnect {
 		// Open a connection and select the database 
 
 		System.out.println("Connecting to database...");
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "81640041Kd");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
 		statement = conn.createStatement();
 
 		String queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.College";
