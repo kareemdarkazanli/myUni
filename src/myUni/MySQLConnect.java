@@ -418,5 +418,22 @@ public class MySQLConnect {
 			
 			return false;
 		}
+
+	public String getMinimumGPA(String college, String major) throws SQLException
+	{
+		String sql = null;
+		ResultSet rs = null;
+
+		sql = "SELECT GPAREQ from major where cName = ? and major = ?";
+		preparedStatement= conn.prepareStatement(sql);
+		preparedStatement.setString(1, college);
+		preparedStatement.setString(2, major);
+		rs = preparedStatement.executeQuery();
+		String gpa = "";
+		if (rs.next()) {
+			gpa = rs.getString("GPAREQ");
+		}
+		return gpa;
+	}
 		
 }
