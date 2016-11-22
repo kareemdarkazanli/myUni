@@ -1,6 +1,7 @@
 package myUni;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * Sets up the SQL connection and supplies various methods to fetch data from the database
@@ -106,8 +107,7 @@ public class MySQLConnect {
 				+ "`pName` VARCHAR(30),"
 				+ "`major` VARCHAR(30),"
 				+ "`pID` INT NOT NULL AUTO_INCREMENT,"
-				+ "PRIMARY KEY (`pID`),"
-				+ "FOREIGN KEY major_foreign_key(cName, major) REFERENCES `ApplyToCollege`.`Major` (cName, major) ON DELETE CASCADE ON UPDATE CASCADE)";
+				+ "PRIMARY KEY (`pID`))";
 		statement.execute(createTableSQL); 
 		alterSQL = "ALTER TABLE professor AUTO_INCREMENT = 2000";
 		pState = conn.prepareStatement(alterSQL);
@@ -261,6 +261,23 @@ public class MySQLConnect {
 			gpa = rs.getString("GPAREQ");
 		}
 		return gpa;
+	}
+
+	public Vector<String> getProfessors(String college, String major){
+		Vector<String> professors = new Vector<>();
+
+		try {
+			Statement myStmt = conn.createStatement();
+			String sql = "SELECT pName FROM professor WHERE cName = '" +  college + "'";
+			ResultSet s = myStmt.executeQuery(sql);
+			while (s.next()) {
+				professors.add(s.getString(1));
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return professors;
 	}
 
 	/**
