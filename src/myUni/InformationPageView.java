@@ -3,6 +3,9 @@ package myUni;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Created by Cassidy Tarng on 11/15/2016.
@@ -77,6 +80,19 @@ public class InformationPageView {
         catch (SQLException e){
             e.printStackTrace();
         }
+
+        // Professors Label
+        JLabel professorLabel = new JLabel("Professors");
+        professorLabel.setBounds(0, 115, 350, 30);
+        professorLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(professorLabel);
+
+        //
+        Vector<String> prof = new MySQLConnect().getProfessors(college, major);
+        JList list = new JList(prof);
+        JScrollPane scrollPane = new JScrollPane(list);
+        scrollPane.setBounds(65, 140, 200, 60);
+        panel.add(scrollPane);
 
         // Make sure the JFrame is visible
         frame.setVisible(true);
