@@ -246,6 +246,23 @@ public class MySQLConnect {
 		return sName;
 	}
 
+	public String getMinGPA(String college, String major) throws SQLException
+	{
+		String sql = null;
+		ResultSet rs = null;
+
+		sql = "SELECT GPAREQ from major where cName = ? and major = ?";
+		preparedStatement= conn.prepareStatement(sql);
+		preparedStatement.setString(1, college);
+		preparedStatement.setString(2, major);
+		rs = preparedStatement.executeQuery();
+		String gpa = "";
+		if (rs.next()) {
+			gpa = rs.getString("GPAREQ");
+		}
+		return gpa;
+	}
+
 	/**
 	 * Runs all the methods that prepare the database to create the database, tables, and to populate the tables with data
 	 * @throws SQLException
@@ -400,23 +417,31 @@ public class MySQLConnect {
 		}
 		
 		//Create a method that applies for a specific major in a college
-		public boolean apply(int sID, String college, String major){
+		public int apply(int sID, String college, String major){
 			//Create a query that inserts into Apply
+			int retVal = 0;
 			Statement myStmt;
 			try {
+				
 				myStmt = conn.createStatement();
+				String sql = "SELECT cName, major, accept " +
+	                  	 "FROM Apply a "+
+	                  	 "WHERE a.sID = '" +  sID + "' AND a.cName = '"  +  college + "' AND a.major = '"  + major + "'" ; 
+				ResultSet s = myStmt.executeQuery(sql);
+				if(!s.next()){
+					//CHANGE TO SQL
+					sql = "INSERT INTO APPLY(sID, cName, major) " +
+		                  	 "VALUES (" + sID +", '" + college +"', '" + major + "');"; 
+					
+					retVal = myStmt.executeUpdate(sql);
+				}
 				
-				//CHANGE TO SQL
-				String sql = "INSERT INTO APPLY(sID, cName, major) " +
-	                  	 "VALUES (" + sID +", '" + college +"', '" + major + "');"; 
-				
-				 myStmt.executeUpdate(sql);
-			} catch (SQLException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			return false;
+			return retVal;
 		}
 
 	public String getMinimumGPA(String college, String major) throws SQLException

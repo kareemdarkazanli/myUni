@@ -22,6 +22,8 @@ public class CollegeApplicationsView extends JFrame{
 	public CollegeApplicationsView(int loggedInStudentID){
 		
 		this.loggedInStudentID = loggedInStudentID;
+		CollegeApplicationsController controller = new CollegeApplicationsController();
+
 		
 		JPanel collegeApplicationsPanel = new JPanel();
 		collegeApplicationsPanel.setLayout(new BoxLayout(collegeApplicationsPanel, BoxLayout.Y_AXIS));
@@ -46,7 +48,22 @@ public class CollegeApplicationsView extends JFrame{
 					if(collegeApplicationsCheckBox.get(i).isSelected()){
 						try {
 						    String[] splitArray = collegeApplications.get(i).split("\\s+");
-						    new CollegeApplicationsController().deleteCollegeApplication(loggedInStudentID, splitArray[0], splitArray[1]);
+						    controller.deleteCollegeApplication(loggedInStudentID, splitArray[0], splitArray[1]);
+							collegeApplications.remove(i);
+						    collegeApplicationsCheckBox.remove(i);
+						} catch (PatternSyntaxException ex) {
+						    // 
+						}
+						
+						
+					}
+				}
+				
+				for(int i = 0; i < collegeApplicationsCheckBox.size(); i++){
+					if(collegeApplicationsCheckBox.get(i).isSelected()){
+						try {
+						    String[] splitArray = collegeApplications.get(i).split("\\s+");
+						    controller.deleteCollegeApplication(loggedInStudentID, splitArray[0], splitArray[1]);
 							collegeApplications.remove(i);
 						    collegeApplicationsCheckBox.remove(i);
 						} catch (PatternSyntaxException ex) {

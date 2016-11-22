@@ -32,6 +32,7 @@ public class InformationPageView {
         // College Label
         JLabel collegeLabel = new JLabel("College Name: ");
         collegeLabel.setBounds(66, 30, 150, 30);
+
         panel.add(collegeLabel);
 
         // College Text
@@ -42,6 +43,7 @@ public class InformationPageView {
         // State Label
         JLabel stateLabel = new JLabel("State: ");
         stateLabel.setBounds(113, 50, 150, 30);
+
         panel.add(stateLabel);
 
         // State Text
@@ -52,6 +54,7 @@ public class InformationPageView {
         // Major Label
         JLabel majorLabel = new JLabel("Major: ");
         majorLabel.setBounds(111, 70, 150, 30);
+
         panel.add(majorLabel);
 
         // Major Text
@@ -69,6 +72,7 @@ public class InformationPageView {
             JLabel minGPAText = new JLabel(new MySQLConnect().getMinimumGPA(college, major));
             minGPAText.setBounds(170, 90, 150, 30);
             panel.add(minGPAText);
+
         }
         catch (SQLException e){
             e.printStackTrace();

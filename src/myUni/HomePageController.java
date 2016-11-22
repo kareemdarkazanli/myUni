@@ -28,7 +28,7 @@ public class HomePageController {
 	}
 	
 	//Create a method that applies for a specific major in a college
-	public boolean apply(int sID, String college, String major){
+	public int apply(int sID, String college, String major){
 		//Get student ID from User singleton
 		return newModel.apply(sID, college, major);
 	}

@@ -104,9 +104,19 @@ public class HomePageView extends JFrame{
 				  String state = stateComboBox.getSelectedItem().toString();
 				  String college = collegeComboBox.getSelectedItem().toString();
 				  String major = majorComboBox.getSelectedItem().toString();
-				  controller.apply(loggedInStudentID, college, major);
-				  } 
-				});
+				  int retVal = controller.apply(loggedInStudentID, college, major);
+				  JFrame frame = new JFrame();
+				  String response;
+				  if(retVal == 1){
+					  response = "You have successfully submitted and application for " + major + " at " +college + ".";
+				  }
+				  else{
+					  response = "You have already submitted an application for " + major + " at " +college + ".";
+				  }
+				  JOptionPane.showMessageDialog(frame,
+						    String.valueOf(response));
+				  }
+			  });
 		
 		JButton viewButton = new JButton("View");
 		viewButton.addActionListener(new ActionListener() { 
