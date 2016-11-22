@@ -2,6 +2,7 @@ package myUni;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 
 /**
  * Created by Cassidy Tarng on 11/15/2016.
@@ -30,33 +31,48 @@ public class InformationPageView {
 
         // College Label
         JLabel collegeLabel = new JLabel("College Name: ");
-        collegeLabel.setBounds(10, 30, 150, 30);
+        collegeLabel.setBounds(65, 30, 150, 30);
         panel.add(collegeLabel);
 
         // College Text
         JLabel collegeText = new JLabel(college);
-        collegeText.setBounds(100, 30, 150, 30);
+        collegeText.setBounds(170, 30, 150, 30);
         panel.add(collegeText);
 
         // State Label
         JLabel stateLabel = new JLabel("State: ");
-        stateLabel.setBounds(56, 50, 150, 30);
+        stateLabel.setBounds(111, 50, 150, 30);
         panel.add(stateLabel);
 
         // State Text
         JLabel stateText = new JLabel(state);
-        stateText.setBounds(100, 50, 150, 30);
+        stateText.setBounds(170, 50, 150, 30);
         panel.add(stateText);
 
         // Major Label
         JLabel majorLabel = new JLabel("Major: ");
-        majorLabel.setBounds(55, 70, 150, 30);
+        majorLabel.setBounds(110, 70, 150, 30);
         panel.add(majorLabel);
 
         // Major Text
         JLabel majorText = new JLabel(major);
-        majorText.setBounds(100, 70, 150, 30);
+        majorText.setBounds(170, 70, 150, 30);
         panel.add(majorText);
+
+        // GPA Label
+        JLabel gpaLabel = new JLabel("Minimum GPA Required: ");
+        gpaLabel.setBounds(10, 90, 150, 30);
+        panel.add(gpaLabel);
+
+        // GPA Text
+        try {
+            JLabel gpaText = new JLabel(new MySQLConnect().getMinGPA(college, major));
+            gpaText.setBounds(170, 90, 150, 30);
+            panel.add(gpaText);
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
 
         // Make sure the JFrame is visible
         frame.setVisible(true);

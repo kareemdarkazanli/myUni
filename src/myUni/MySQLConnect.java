@@ -246,6 +246,23 @@ public class MySQLConnect {
 		return sName;
 	}
 
+	public String getMinGPA(String college, String major) throws SQLException
+	{
+		String sql = null;
+		ResultSet rs = null;
+
+		sql = "SELECT GPAREQ from major where cName = ? and major = ?";
+		preparedStatement= conn.prepareStatement(sql);
+		preparedStatement.setString(1, college);
+		preparedStatement.setString(2, major);
+		rs = preparedStatement.executeQuery();
+		String gpa = "";
+		if (rs.next()) {
+			gpa = rs.getString("GPAREQ");
+		}
+		return gpa;
+	}
+
 	/**
 	 * Runs all the methods that prepare the database to create the database, tables, and to populate the tables with data
 	 * @throws SQLException
