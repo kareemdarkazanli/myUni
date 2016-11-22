@@ -107,7 +107,10 @@ public class MySQLConnect {
 				+ "`pName` VARCHAR(30),"
 				+ "`major` VARCHAR(30),"
 				+ "`pID` INT NOT NULL AUTO_INCREMENT,"
-				+ "PRIMARY KEY (`pID`))";
+				+ "PRIMARY KEY (`pID`))"
+				+ "FOREIGN KEY major_foreign_key(cName, major) "
+				+ "REFERENCES `ApplyToCollege`.`Major` (cName, major) "
+				+ "ON DELETE CASCADE ON UPDATE CASCADE)";
 		statement.execute(createTableSQL); 
 		alterSQL = "ALTER TABLE professor AUTO_INCREMENT = 2000";
 		pState = conn.prepareStatement(alterSQL);
