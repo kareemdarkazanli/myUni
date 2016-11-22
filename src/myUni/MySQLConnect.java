@@ -103,11 +103,11 @@ public class MySQLConnect {
 		stmtDrop.execute(queryDrop);
 
 		createTableSQL = "CREATE TABLE `ApplyToCollege`.`Professor` (" 
-				+ "`cName` VARCHAR(30) NOT NULL,"
-				+ "`pName` VARCHAR(30),"
-				+ "`major` VARCHAR(30),"
-				+ "`pID` INT NOT NULL AUTO_INCREMENT,"
-				+ "PRIMARY KEY (`pID`))"
+				+ "`cName` VARCHAR(30) NOT NULL, "
+				+ "`pName` VARCHAR(30), "
+				+ "`major` VARCHAR(30) NOT NULL, "
+				+ "`pID` INT NOT NULL AUTO_INCREMENT, "
+				+ "PRIMARY KEY (`pID`), "
 				+ "FOREIGN KEY major_foreign_key(cName, major) "
 				+ "REFERENCES `ApplyToCollege`.`Major` (cName, major) "
 				+ "ON DELETE CASCADE ON UPDATE CASCADE)";
