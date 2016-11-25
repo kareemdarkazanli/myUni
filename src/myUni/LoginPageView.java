@@ -99,7 +99,7 @@ public class LoginPageView extends JFrame implements ActionListener, ChangeListe
 					String loggedInStudentName = theModel.getStudentName(loggedInStudentID);
 					JOptionPane.showMessageDialog(controllingFrame,
 							"Success! Now logged in as " + loggedInStudentName + ". Your ID number is: " + loggedInStudentID);
-					new HomePageView(loggedInStudentID).setVisible(true); //new instance of a home page view here
+					new HomePageView(loggedInStudentID, theModel).setVisible(true); //new instance of a home page view here
 				    this.dispose(); //to close the current frame
 				} else {
 					JOptionPane.showMessageDialog(controllingFrame,

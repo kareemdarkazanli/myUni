@@ -271,7 +271,7 @@ public class MySQLConnect {
 
 		try {
 			Statement myStmt = conn.createStatement();
-			String sql = "SELECT pName FROM professor WHERE cName = '" +  college + "'";
+			String sql = "SELECT pName FROM professor WHERE cName = '" +  college + "' AND major = '" + major + "'";
 			ResultSet s = myStmt.executeQuery(sql);
 			while (s.next()) {
 				professors.add(s.getString(1));

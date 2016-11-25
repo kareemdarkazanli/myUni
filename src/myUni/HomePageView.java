@@ -8,11 +8,11 @@ import javax.swing.*;
 
 public class HomePageView extends JFrame{
 	private int loggedInStudentID; //the sID of the student that has successfully logged in
-	public HomePageView(int loggedInStudentID){
+	public HomePageView(int loggedInStudentID, MySQLConnect theModel){
 		this.loggedInStudentID = loggedInStudentID;
 		
 		
-		HomePageController controller = new HomePageController();
+		HomePageController controller = new HomePageController(theModel);
 		
 
 		//Create 3 comboboxes for the filters
@@ -32,6 +32,9 @@ public class HomePageView extends JFrame{
 		JComboBox stateComboBox = new JComboBox(statesArray);
 		JComboBox collegeComboBox = new JComboBox(collegesArray);
 		JComboBox majorComboBox = new JComboBox(majorsArray);
+		JLabel statesLabel = new JLabel("State:    ");
+		JLabel collegesLabel = new JLabel("College: ");
+		JLabel majorsLabel = new JLabel("Major:    ");
 		
 		
 		stateComboBox.addActionListener(new ActionListener() { 
@@ -91,8 +94,8 @@ public class HomePageView extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
+				dispose();
+                new LoginPageView(theModel);
 			}
 			
 		});
@@ -133,11 +136,27 @@ public class HomePageView extends JFrame{
 
 
 		//Drop down filters with apply and view buttons
+		//state filters and label
+		JPanel statesPanel = new JPanel();
+		statesPanel.setLayout(new BoxLayout(statesPanel, BoxLayout.X_AXIS));
+		statesPanel.add(statesLabel);
+		statesPanel.add(stateComboBox);
+		//college filters and label
+		JPanel collegesPanel = new JPanel();
+		collegesPanel.setLayout(new BoxLayout(collegesPanel, BoxLayout.X_AXIS));
+		collegesPanel.add(collegesLabel);
+		collegesPanel.add(collegeComboBox);
+		//major filters and label
+		JPanel majorsPanel = new JPanel();
+		majorsPanel.setLayout(new BoxLayout(majorsPanel, BoxLayout.X_AXIS));
+		majorsPanel.add(majorsLabel);
+		majorsPanel.add(majorComboBox);
+		//the surrounding layout
 		JPanel filterPanel = new JPanel();
 		filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
-		filterPanel.add(stateComboBox);
-		filterPanel.add(collegeComboBox);
-		filterPanel.add(majorComboBox);
+		filterPanel.add(statesPanel);
+		filterPanel.add(collegesPanel);
+		filterPanel.add(majorsPanel);
 		filterPanel.add(buttonPanel);	
 		filterPanel.add(Box.createVerticalGlue());	
 		

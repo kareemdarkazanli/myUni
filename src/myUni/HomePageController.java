@@ -5,11 +5,20 @@ import java.util.ArrayList;
 public class HomePageController {
 	
 	//Have instance of model
-	MySQLConnect newModel = new MySQLConnect();
+	private MySQLConnect newModel;
 	//Get instance of User singleton
 	
-	public HomePageController(){
-		
+	public HomePageController(MySQLConnect theModel){
+		newModel = theModel;
+	}
+	
+	/**
+	 * getter for the model
+	 * @return an instance of the model
+	 */
+	public MySQLConnect getModel()
+	{
+		return newModel;
 	}
 	
 	//Create method that gets all states
