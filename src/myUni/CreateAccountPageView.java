@@ -128,6 +128,7 @@ public class CreateAccountPageView {
         });
 
         // Make sure the JFrame is visible
+		frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 

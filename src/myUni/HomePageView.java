@@ -173,6 +173,7 @@ public class HomePageView extends JFrame{
 	    this.add(filterPanel, BorderLayout.EAST);
 	    this.add(optionsPanel, BorderLayout.WEST);
 	    this.setSize(500, 300); 
+		this.setLocationRelativeTo(null);
 	    this.setVisible(true);
 		
 	}

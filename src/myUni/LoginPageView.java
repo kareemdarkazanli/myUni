@@ -46,6 +46,7 @@ public class LoginPageView extends JFrame implements ActionListener, ChangeListe
 		surrounding.add(buttonPane);
 		add(surrounding);
 		pack();
+		this.setLocationRelativeTo(null);
 		setVisible(true);
 
 	}
