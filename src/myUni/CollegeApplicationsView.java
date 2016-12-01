@@ -90,6 +90,7 @@ public class CollegeApplicationsView extends JFrame{
 		this.add(deleteButton, BorderLayout.SOUTH);
 
 	    this.setSize(500, 300); 
+		this.setLocationRelativeTo(null);
 	    this.setVisible(true);
 	}
 
