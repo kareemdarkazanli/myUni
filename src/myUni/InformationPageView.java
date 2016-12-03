@@ -35,7 +35,6 @@ public class InformationPageView {
         // College Label
         JLabel collegeLabel = new JLabel("College Name: ");
         collegeLabel.setBounds(66, 30, 150, 30);
-
         panel.add(collegeLabel);
 
         // College Text
@@ -46,34 +45,43 @@ public class InformationPageView {
         // State Label
         JLabel stateLabel = new JLabel("State: ");
         stateLabel.setBounds(113, 50, 150, 30);
-
         panel.add(stateLabel);
 
         // State Text
         JLabel stateText = new JLabel(state);
         stateText.setBounds(170, 50, 150, 30);
         panel.add(stateText);
+        
+        //Enrollment Label
+        JLabel enrollmentLabel = new JLabel("Enrollment: ");
+        enrollmentLabel.setBounds(85, 70, 150, 30);    
+        panel.add(enrollmentLabel);
+
+        //Enrollment Text
+        int enrollment = new MySQLConnect().getEnrollment(college);
+        JLabel enrollmentText = new JLabel(String.valueOf(enrollment));
+        enrollmentText.setBounds(170, 70, 150, 30);
+        panel.add(enrollmentText);
 
         // Major Label
         JLabel majorLabel = new JLabel("Major: ");
-        majorLabel.setBounds(111, 70, 150, 30);
-
+        majorLabel.setBounds(111, 90, 150, 30);
         panel.add(majorLabel);
 
         // Major Text
         JLabel majorText = new JLabel(major);
-        majorText.setBounds(170, 70, 150, 30);
+        majorText.setBounds(170, 90, 150, 30);
         panel.add(majorText);
 
         // Minimum GPA Label
         JLabel minGPALabel = new JLabel("Minimum GPA Required: ");
-        minGPALabel.setBounds(10, 90, 150, 30);
+        minGPALabel.setBounds(10, 110, 150, 30);
         panel.add(minGPALabel);
 
         // Minimum GPA Text
         try {
             JLabel minGPAText = new JLabel(new MySQLConnect().getMinimumGPA(college, major));
-            minGPAText.setBounds(170, 90, 150, 30);
+            minGPAText.setBounds(170, 110, 150, 30);
             panel.add(minGPAText);
 
         }
@@ -83,7 +91,7 @@ public class InformationPageView {
 
         // Professors Label
         JLabel professorLabel = new JLabel("Professors");
-        professorLabel.setBounds(0, 115, 350, 30);
+        professorLabel.setBounds(0, 125, 350, 30);
         professorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(professorLabel);
 
@@ -91,7 +99,7 @@ public class InformationPageView {
         Vector<String> prof = new MySQLConnect().getProfessors(college, major);
         JList list = new JList(prof);
         JScrollPane scrollPane = new JScrollPane(list);
-        scrollPane.setBounds(65, 140, 200, 60);
+        scrollPane.setBounds(65, 150, 200, 60);
         panel.add(scrollPane);
 
         // Make sure the JFrame is visible

@@ -31,7 +31,7 @@ public class MySQLConnect {
 		System.out.println("Connecting to database...");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			String queryDrop = "DROP SCHEMA IF EXISTS ApplyToCollege";
 			Statement stmtDrop = conn.createStatement();
 			stmtDrop.execute(queryDrop);
@@ -73,7 +73,7 @@ public class MySQLConnect {
 		// Open a connection and select the database 
 		try {
 			System.out.println("Connecting to database...");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			statement = conn.createStatement();
 
 			String queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.College";
@@ -172,6 +172,39 @@ public class MySQLConnect {
 			pState = conn.prepareStatement(acceptTrigger);
 			pState.executeUpdate();
 			System.out.println("Accept trigger created successfully");
+			
+			String incEnrollment = "CREATE TRIGGER incEnrollment "
+					+ "AFTER INSERT ON Apply "
+					+ "FOR EACH ROW "
+					+ "BEGIN "
+					+ "IF (NEW.accept = TRUE ) "
+					+ "THEN "
+					+ "UPDATE College "
+					+ "SET enrollment = enrollment + 1 "
+					+ "WHERE College.cName = NEW.cName; "
+					+ "END IF; "
+					+ "END; ";
+			
+			pState = conn.prepareStatement(incEnrollment);
+			pState.executeUpdate();
+			System.out.println("IncEnrollment Trigger created successfully");
+			
+			String decEnrollment = "CREATE TRIGGER decEnrollment "
+					+ "AFTER DELETE ON Apply "
+					+ "FOR EACH ROW "
+					+ "BEGIN "
+					+ "IF (OLD.accept = TRUE ) "
+					+ "THEN "
+					+ "UPDATE College "
+					+ "SET enrollment = enrollment - 1 "
+					+ "WHERE College.cName = OLD.cName; "
+					+ "END IF; "
+					+ "END; ";
+			
+			pState = conn.prepareStatement(decEnrollment);
+			pState.executeUpdate();
+			System.out.println("DecEnrollment Trigger created successfully");
+			
 		}
 		catch(SQLException e)
 		{
@@ -199,7 +232,7 @@ public class MySQLConnect {
 	{
 		try{
 
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			statement = conn.createStatement();
 			System.out.println("Load data from a file colleges.txt");
 			String loadDataSQL = "LOAD DATA LOCAL INFILE 'colleges.txt' INTO TABLE COLLEGE";
@@ -249,7 +282,7 @@ public class MySQLConnect {
 		int count = 0;
 		try{
 
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 
 			sql = "SELECT count(*) from student where sName = ? and password = ?";
 			preparedStatement= conn.prepareStatement(sql);
@@ -295,7 +328,7 @@ public class MySQLConnect {
 		int sID = 0;
 
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			sql = "SELECT sID from student where sName = ? and password = ?";
 			preparedStatement = conn.prepareStatement(sql);
 			preparedStatement.setString(1, sName);
@@ -336,7 +369,7 @@ public class MySQLConnect {
 		ResultSet rs = null;
 		String sName = "";
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 
 			sql = "SELECT sName from student where sID = ?";
 			preparedStatement= conn.prepareStatement(sql);
@@ -376,7 +409,7 @@ public class MySQLConnect {
 		ResultSet rs = null;
 		String gpa = "";
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			sql = "SELECT GPAREQ from major where cName = ? and major = ?";
 			preparedStatement= conn.prepareStatement(sql);
 			preparedStatement.setString(1, college);
@@ -406,6 +439,45 @@ public class MySQLConnect {
 		return gpa;
 	}
 	/**
+	 * Retrieves enrollment number from a college
+	 * @param college
+	 * @return enrollment
+	 */
+	public int getEnrollment(String college){
+		int enrollment = 0;
+
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			ResultSet rs;
+			String sql;
+			
+			sql = "SELECT enrollment from College where cName = ?";
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setString(1, college);
+			rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				enrollment = rs.getInt("enrollment");
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(preparedStatement != null)
+			{
+				try {preparedStatement.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+		return enrollment;
+	}
+	
+	/**
 	 * Retrieves all the professors at a college for that major
 	 * @param college
 	 * @param major
@@ -415,7 +487,7 @@ public class MySQLConnect {
 		Vector<String> professors = new Vector<>();
 		Statement myStmt = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			myStmt = conn.createStatement();
 			String sql = "SELECT pName FROM professor WHERE cName = '" +  college + "' AND major = '" + major + "'";
 			ResultSet s = myStmt.executeQuery(sql);
@@ -464,7 +536,7 @@ public class MySQLConnect {
 		ResultSet rs = null;
 		boolean flag = false;
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			sql = "SELECT sName from student";
 			preparedStatement = conn.prepareStatement(sql);
 			rs = preparedStatement.executeQuery();
@@ -502,7 +574,7 @@ public class MySQLConnect {
 		String sql = null;
 		ResultSet rs = null;
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			sql = "INSERT INTO student(sname, password, GPA) VALUES (?,?,?)";
 			preparedStatement= conn.prepareStatement(sql);
 			preparedStatement.setString(1, username);
@@ -538,7 +610,7 @@ public class MySQLConnect {
 			Statement myStmt = null;
 
 			try{
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 				myStmt = conn.createStatement();
 
 				String sql = "SELECT state " +
@@ -577,7 +649,7 @@ public class MySQLConnect {
 			ArrayList<String> colleges = new ArrayList<String>();
 			Statement myStmt = null;
 			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 				myStmt = conn.createStatement();
 				String sql = "SELECT cName " +
 	                  	 "FROM College c "+
@@ -616,7 +688,7 @@ public class MySQLConnect {
 			ArrayList<String> majors = new ArrayList<String>();
 			Statement myStmt = null;
 			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 				myStmt = conn.createStatement();
 				String sql = "SELECT major " +
 	                  	 "FROM Major m "+
@@ -647,7 +719,7 @@ public class MySQLConnect {
 			//Create a query that inserts into Apply
 			Statement myStmt = null;
 			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 				myStmt = conn.createStatement();
 				
 				//CHANGE TO SQL
@@ -679,7 +751,7 @@ public class MySQLConnect {
 			ArrayList<String> collegeApplications = new ArrayList<String>();
 			Statement myStmt = null;
 			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 				myStmt = conn.createStatement();
 				String sql = "SELECT cName, major, accept " +
 	                  	 "FROM Apply a "+
@@ -717,7 +789,7 @@ public class MySQLConnect {
 			int retVal = 0;
 			Statement myStmt = null;
 			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 				myStmt = conn.createStatement();
 				String sql = "SELECT cName, major, accept " +
 	                  	 "FROM Apply a "+
@@ -756,7 +828,7 @@ public class MySQLConnect {
 		ResultSet rs = null;
 		String gpa = "";
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", "root", "");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			sql = "SELECT GPAREQ from major where cName = ? and major = ?";
 			preparedStatement= conn.prepareStatement(sql);
 			preparedStatement.setString(1, college);
