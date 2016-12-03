@@ -284,10 +284,10 @@ public class MySQLConnect {
 
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 
-			sql = "SELECT count(*) from student where sName = ? and password = ?";
+			sql = "SELECT count(*) from student WHERE password = ? GROUP BY sName having sName = ?";
 			preparedStatement= conn.prepareStatement(sql);
-			preparedStatement.setString(1, inputName);
-			preparedStatement.setString(2,inputPassword );
+			preparedStatement.setString(2, inputName);
+			preparedStatement.setString(1,inputPassword );
 			rs = preparedStatement.executeQuery();
 			if (rs.next()) {
 				count = rs.getInt("count(*)");
@@ -410,7 +410,7 @@ public class MySQLConnect {
 		String gpa = "";
 		try{
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-			sql = "SELECT GPAREQ from major where cName = ? and major = ?";
+			sql = "SELECT GPAREQ from major JOIN college ON major.cName = college.cName WHERE college.cName = ? AND major = ?;";
 			preparedStatement= conn.prepareStatement(sql);
 			preparedStatement.setString(1, college);
 			preparedStatement.setString(2, major);
@@ -615,7 +615,7 @@ public class MySQLConnect {
 
 				String sql = "SELECT state " +
 		                   	 "FROM College "+
-		                   	 "GROUP BY state"; 
+		                   	 "GROUP BY state HAVING LENGTH(STATE) = 2";
 				ResultSet s = myStmt.executeQuery(sql);
 				while (s.next()) {
 				    states.add(s.getString(1));
@@ -690,9 +690,10 @@ public class MySQLConnect {
 			try {
 				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 				myStmt = conn.createStatement();
-				String sql = "SELECT major " +
-	                  	 "FROM Major m "+
-	                  	 "WHERE m.cName = '" +  college + "'"; 
+				String sql = "SELECT DISTINCT major " +
+						"FROM Major m "+
+						"WHERE m.cName IN (SELECT cName FROM College WHERE cName = '"
+						+  college + "')";
 				ResultSet s = myStmt.executeQuery(sql);
 				while (s.next()) {
 				    majors.add(s.getString(1));
@@ -753,9 +754,8 @@ public class MySQLConnect {
 			try {
 				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 				myStmt = conn.createStatement();
-				String sql = "SELECT cName, major, accept " +
-	                  	 "FROM Apply a "+
-	                  	 "WHERE a.sID = '" +  sID + "'"; 
+				String sql = "SELECT college.cName, major, accept FROM apply LEFT OUTER JOIN college ON " +
+	                  	 "apply.cName = college.cName WHERE apply.sID = '" +  sID + "'";
 				ResultSet s = myStmt.executeQuery(sql);
 				while (s.next()) {
 					String accepted = "Accepted";
@@ -829,7 +829,7 @@ public class MySQLConnect {
 		String gpa = "";
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-			sql = "SELECT GPAREQ from major where cName = ? and major = ?";
+			sql = "SELECT GPAREQ from major JOIN college ON major.cName = college.cName WHERE college.cName = ? AND major = ?;";
 			preparedStatement= conn.prepareStatement(sql);
 			preparedStatement.setString(1, college);
 			preparedStatement.setString(2, major);
