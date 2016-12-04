@@ -108,6 +108,16 @@ public class HomePageView extends JFrame{
 			
 		});
 		
+		JButton accountInfoButton = new JButton("Account Info");
+		accountInfoButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new AccountInfoView(loggedInStudentID);
+			}
+			
+		});
+		
 		JButton logoutButton = new JButton("Logout");
 		logoutButton.addActionListener(new ActionListener(){
 
@@ -184,6 +194,7 @@ public class HomePageView extends JFrame{
 		optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
 		optionsPanel.add(logoutButton);
 		optionsPanel.add(collegeApplicationsButton);
+		optionsPanel.add(accountInfoButton);
 		optionsPanel.add(Box.createVerticalGlue());	
 		
 		JPanel archivePanel = new JPanel();

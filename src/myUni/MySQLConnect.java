@@ -670,6 +670,160 @@ public class MySQLConnect {
 		}
 		return states;
 	}
+	
+	/**
+	 * Updates the name, password, gpa
+	 * @param sID
+	 * @param username
+	 * @param password
+	 * @param GPA
+	 * @throws SQLException
+	 */
+	public void updateAccountInfo(int sID, String username, String password, Float gpa) throws SQLException{
+		String sql = null;
+		Statement stmt = null;
+		try{
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			sql = "UPDATE student SET sName = '" + username + "' , password = '" + password + "' , GPA = '" + gpa + "' WHERE sID = '" + sID + "';";
+			stmt = conn.createStatement();
+			stmt.executeUpdate(sql);
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(stmt != null)
+			{
+				try {stmt.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+
+	}
+	
+	/**
+	 * gets password of a student
+	 * @param studentID
+	 * @return password
+	 */
+	public String getPassword(int sID){
+		String password = "";
+
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			ResultSet rs;
+			String sql;
+
+			sql = "SELECT password from student where sID = ?";
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, sID);
+			rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				password = rs.getString("password");
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(preparedStatement != null)
+			{
+				try {preparedStatement.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+		return password;
+	}
+	
+	
+	/**
+	 * gets name of a student
+	 * @param studentID
+	 * @return name
+	 */
+	public String getName(int sID){
+		String name = "";
+
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			ResultSet rs;
+			String sql;
+
+			sql = "SELECT sName from student where sID = ?";
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, sID);
+			rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				name = rs.getString("sName");
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(preparedStatement != null)
+			{
+				try {preparedStatement.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+		return name;
+	}
+	
+	
+	/**
+	 * gets GPA of a student
+	 * @param studentID
+	 * @return GPA
+	 */
+	public float getGPA(int sID){
+		float gpa = 0;
+
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			ResultSet rs;
+			String sql;
+
+			sql = "SELECT GPA from student where sID = ?";
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, sID);
+			rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				gpa = rs.getFloat("GPA");
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(preparedStatement != null)
+			{
+				try {preparedStatement.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+		return gpa;
+	}
 
 	/**
 	 * gets all colleges from a specific state
