@@ -2,7 +2,11 @@ package myUni;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.*;
 
@@ -76,7 +80,22 @@ public class HomePageView extends JFrame{
 					  } 
 				  }	   
 				});
-		
+
+		//spinner for the archiving function
+		SpinnerModel model1 = new SpinnerDateModel();
+		JSpinner spinner1 = new JSpinner(model1);
+		JButton archiveButton = new JButton("Archive all applications before selected date");
+		JFrame containingFrame = this;
+		archiveButton.addActionListener(new ActionListener()
+		{
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int numberOfApplicationsArchived = theModel.archiveApplications(new java.sql.Date(((Date) model1.getValue()).getTime()));
+				  JOptionPane.showMessageDialog(containingFrame, numberOfApplicationsArchived + " old applications successfully archived");
+			}
+
+		});
 		
 		
 		JButton collegeApplicationsButton = new JButton("College Applications");
@@ -167,11 +186,14 @@ public class HomePageView extends JFrame{
 		optionsPanel.add(collegeApplicationsButton);
 		optionsPanel.add(Box.createVerticalGlue());	
 		
-		
-		
+		JPanel archivePanel = new JPanel();
+		archivePanel.add(spinner1);
+		archivePanel.add(archiveButton);
+
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    this.add(filterPanel, BorderLayout.EAST);
 	    this.add(optionsPanel, BorderLayout.WEST);
+	    this.add(archivePanel, BorderLayout.SOUTH);
 	    this.setSize(500, 300); 
 		this.setLocationRelativeTo(null);
 	    this.setVisible(true);

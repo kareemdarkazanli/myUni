@@ -84,12 +84,21 @@ public class CollegeApplicationsView extends JFrame{
 			
 		});
 		
-		
+		JButton backButton = new JButton("Back to Homepage");
+		backButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
 		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    this.add(collegeApplicationsPanel, BorderLayout.CENTER);
-		this.add(deleteButton, BorderLayout.SOUTH);
-
-	    this.setSize(500, 300); 
+		buttonPanel.add(deleteButton, BorderLayout.NORTH);
+		buttonPanel.add(backButton, BorderLayout.SOUTH);
+		this.add(buttonPanel, BorderLayout.SOUTH);
+	    this.setSize(500, 300);
 		this.setLocationRelativeTo(null);
 	    this.setVisible(true);
 	}

@@ -19,7 +19,7 @@ public class MySQLConnect {
 	private static Connection conn = null;
 	private static Statement statement = null;
 	private static PreparedStatement preparedStatement = null;
-	
+
 	/**
 	 * Creates the database
 	 * @throws SQLException
@@ -138,17 +138,32 @@ public class MySQLConnect {
 
 			queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.Apply";
 			stmtDrop.execute(queryDrop);
-
+			//Apply table has archiving feature
 			createTableSQL = "CREATE TABLE `ApplyToCollege`.`Apply` (" 
 					+ "`sID` INT NOT NULL,"
-					+ "`cName` VARCHAR(30),"
-					+ "`major` VARCHAR(30),"
-					+ "`accept` BOOLEAN,"
+					+ "`cName` VARCHAR(30), "
+					+ "`major` VARCHAR(30), "
+					+ "`accept` BOOLEAN, "
+					+ "updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
+					+ "PRIMARY KEY (`sID`,`cName`,`major`),"
+					+ "FOREIGN KEY sID_foreign_key(sID) REFERENCES `ApplyToCollege`.`Student` (sID) ON DELETE CASCADE ON UPDATE CASCADE,"
+					+ "FOREIGN KEY cName_foreign_key(cName, major) REFERENCES `ApplyToCollege`.`Major` (cName, major) ON DELETE CASCADE ON UPDATE CASCADE)";
+			
+			
+			statement.execute(createTableSQL); 
+			System.out.println("Table called Apply created successfully...");
+			
+			createTableSQL = "CREATE TABLE `ApplyToCollege`.`Archive` (" 
+					+ "`sID` INT NOT NULL,"
+					+ "`cName` VARCHAR(30), "
+					+ "`major` VARCHAR(30), "
+					+ "`accept` BOOLEAN, "
+					+ "updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
 					+ "PRIMARY KEY (`sID`,`cName`,`major`),"
 					+ "FOREIGN KEY sID_foreign_key(sID) REFERENCES `ApplyToCollege`.`Student` (sID) ON DELETE CASCADE ON UPDATE CASCADE,"
 					+ "FOREIGN KEY cName_foreign_key(cName, major) REFERENCES `ApplyToCollege`.`Major` (cName, major) ON DELETE CASCADE ON UPDATE CASCADE)";
 			statement.execute(createTableSQL); 
-			System.out.println("Table called Apply created successfully...");
+			System.out.println("Table called Archive created successfully...");
 
 			String dropTrigger = "DROP TRIGGER IF EXISTS acceptance";
 			stmtDrop.execute(dropTrigger);
@@ -172,7 +187,7 @@ public class MySQLConnect {
 			pState = conn.prepareStatement(acceptTrigger);
 			pState.executeUpdate();
 			System.out.println("Accept trigger created successfully");
-			
+
 			String incEnrollment = "CREATE TRIGGER incEnrollment "
 					+ "AFTER INSERT ON Apply "
 					+ "FOR EACH ROW "
@@ -184,11 +199,11 @@ public class MySQLConnect {
 					+ "WHERE College.cName = NEW.cName; "
 					+ "END IF; "
 					+ "END; ";
-			
+
 			pState = conn.prepareStatement(incEnrollment);
 			pState.executeUpdate();
 			System.out.println("IncEnrollment Trigger created successfully");
-			
+
 			String decEnrollment = "CREATE TRIGGER decEnrollment "
 					+ "AFTER DELETE ON Apply "
 					+ "FOR EACH ROW "
@@ -200,11 +215,28 @@ public class MySQLConnect {
 					+ "WHERE College.cName = OLD.cName; "
 					+ "END IF; "
 					+ "END; ";
-			
+
 			pState = conn.prepareStatement(decEnrollment);
 			pState.executeUpdate();
 			System.out.println("DecEnrollment Trigger created successfully");
-			
+			String dropProcedure = "DROP PROCEDURE IF EXISTS archiveApplications";
+			stmtDrop.execute(dropProcedure);
+			String archiveProcedure = "CREATE PROCEDURE archiveApplications(IN archiveByDate DATE, OUT numberOfApps INT) "
+					+ "BEGIN "
+					+ "insert into Archive "
+					+ "(SELECT *"
+					+ "FROM Apply "
+					+ "WHERE updatedAt < archiveByDate "
+					+ "); "
+					+ " "
+					+ "select count(*) INTO numberOfApps from Apply where updatedAt < archiveByDate; "
+					+ " "
+					+ "delete from Apply " 
+					+ "where updatedAt < archiveByDate; "
+					+ "END; ";
+			pState = conn.prepareStatement(archiveProcedure);
+			pState.executeUpdate();
+			System.out.println("Archiving procedure created successfully");
 		}
 		catch(SQLException e)
 		{
@@ -265,7 +297,7 @@ public class MySQLConnect {
 				try {statement.close();} catch (SQLException e) {e.printStackTrace();}
 			}
 		}
-		
+
 
 	}
 
@@ -292,7 +324,7 @@ public class MySQLConnect {
 			if (rs.next()) {
 				count = rs.getInt("count(*)");
 			}
-			
+
 		}
 		catch(SQLException e)
 		{
@@ -313,7 +345,7 @@ public class MySQLConnect {
 			return true;
 		else
 			return false;
-		
+
 	}
 
 	/**
@@ -355,7 +387,7 @@ public class MySQLConnect {
 		}
 
 		return sID;
-		
+
 	}
 	/**
 	 * Retrieves the student's name from their sID
@@ -450,7 +482,7 @@ public class MySQLConnect {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			ResultSet rs;
 			String sql;
-			
+
 			sql = "SELECT enrollment from College where cName = ?";
 			preparedStatement = conn.prepareStatement(sql);
 			preparedStatement.setString(1, college);
@@ -476,7 +508,7 @@ public class MySQLConnect {
 		}
 		return enrollment;
 	}
-	
+
 	/**
 	 * Retrieves all the professors at a college for that major
 	 * @param college
@@ -597,232 +629,246 @@ public class MySQLConnect {
 				try {preparedStatement.close();} catch (SQLException e) {e.printStackTrace();}
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Retrieves all states from the database
 	 * @return an array list containing all of the states
 	 */
-		public ArrayList<String> getAllStates(){
-			//Create query that gets all states
-			ArrayList<String> states = new ArrayList<String>();
-			Statement myStmt = null;
+	public ArrayList<String> getAllStates(){
+		//Create query that gets all states
+		ArrayList<String> states = new ArrayList<String>();
+		Statement myStmt = null;
 
-			try{
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-				myStmt = conn.createStatement();
+		try{
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			myStmt = conn.createStatement();
 
-				String sql = "SELECT state " +
-		                   	 "FROM College "+
-		                   	 "GROUP BY state HAVING LENGTH(STATE) = 2";
-				ResultSet s = myStmt.executeQuery(sql);
-				while (s.next()) {
-				    states.add(s.getString(1));
-				}   
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}
-			finally
-			{
-				if(conn != null)
-				{
-					try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-				if(myStmt != null)
-				{
-					try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-			}
-			return states;
+			String sql = "SELECT state " +
+					"FROM College "+
+					"GROUP BY state HAVING LENGTH(STATE) = 2";
+			ResultSet s = myStmt.executeQuery(sql);
+			while (s.next()) {
+				states.add(s.getString(1));
+			}   
 		}
-		
-		/**
-		 * gets all colleges from a specific state
-		 * @param state the state
-		 * @return array list of the colleges
-		 */
-		public ArrayList<String> getAllColleges(String state){
-			//Create query that gets all colleges from state
-			ArrayList<String> colleges = new ArrayList<String>();
-			Statement myStmt = null;
-			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-				myStmt = conn.createStatement();
-				String sql = "SELECT cName " +
-	                  	 "FROM College c "+
-	                  	 "WHERE c.state = '" + state + "'"; 
-				ResultSet s = myStmt.executeQuery(sql);
-				while (s.next()) {
-				    colleges.add(s.getString(1));
-				}   
-			} 
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}
-			finally
-			{
-				if(conn != null)
-				{
-					try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-				if(myStmt != null)
-				{
-					try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-			}
-			return colleges;
+		catch(SQLException e)
+		{
+			e.printStackTrace();
 		}
-		
-		/**
-		 * Gets all majors from a specific college
-		 * @param college
-		 * @return
-		 */
-		public ArrayList<String> getAllMajors(String college){
-			
-			//Create query that gets all colleges from state
-			ArrayList<String> majors = new ArrayList<String>();
-			Statement myStmt = null;
-			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-				myStmt = conn.createStatement();
-				String sql = "SELECT DISTINCT major " +
-						"FROM Major m "+
-						"WHERE m.cName IN (SELECT cName FROM College WHERE cName = '"
-						+  college + "')";
-				ResultSet s = myStmt.executeQuery(sql);
-				while (s.next()) {
-				    majors.add(s.getString(1));
-				}   
-			} catch(SQLException e)
+		finally
+		{
+			if(conn != null)
 			{
-				e.printStackTrace();
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
 			}
-			finally
+			if(myStmt != null)
 			{
-				if(conn != null)
-				{
-					try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-				if(myStmt != null)
-				{
-					try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
-				}
+				try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
 			}
-			return majors;
 		}
-		
-		public void deleteCollegeApplication(int sID, String cName, String major){
-			//Create a query that inserts into Apply
-			Statement myStmt = null;
-			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-				myStmt = conn.createStatement();
-				
+		return states;
+	}
+
+	/**
+	 * gets all colleges from a specific state
+	 * @param state the state
+	 * @return array list of the colleges
+	 */
+	public ArrayList<String> getAllColleges(String state){
+		//Create query that gets all colleges from state
+		ArrayList<String> colleges = new ArrayList<String>();
+		Statement myStmt = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			myStmt = conn.createStatement();
+			String sql = "SELECT cName " +
+					"FROM College c "+
+					"WHERE c.state = '" + state + "'"; 
+			ResultSet s = myStmt.executeQuery(sql);
+			while (s.next()) {
+				colleges.add(s.getString(1));
+			}   
+		} 
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(myStmt != null)
+			{
+				try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+		return colleges;
+	}
+
+	/**
+	 * Gets all majors from a specific college
+	 * @param college
+	 * @return
+	 */
+	public ArrayList<String> getAllMajors(String college){
+
+		//Create query that gets all colleges from state
+		ArrayList<String> majors = new ArrayList<String>();
+		Statement myStmt = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			myStmt = conn.createStatement();
+			String sql = "SELECT DISTINCT major " +
+					"FROM Major m "+
+					"WHERE m.cName IN (SELECT cName FROM College WHERE cName = '"
+					+  college + "')";
+			ResultSet s = myStmt.executeQuery(sql);
+			while (s.next()) {
+				majors.add(s.getString(1));
+			}   
+		} catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(myStmt != null)
+			{
+				try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+		return majors;
+	}
+
+	public void deleteCollegeApplication(int sID, String cName, String major){
+		//Create a query that inserts into Apply
+		Statement myStmt = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			myStmt = conn.createStatement();
+
+			//CHANGE TO SQL
+			String sql = "DELETE FROM Apply WHERE sID = "+ sID + " AND cName = '"+ cName + "' AND major = '"+ major + "';";			
+			myStmt.executeUpdate(sql);
+		} catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(myStmt != null)
+			{
+				try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+	}
+	/**
+	 * gets all the college applications for a student
+	 * @param sID
+	 * @return
+	 */
+	public ArrayList<String> getCollegeApplications(int sID){
+		//Create a query that inserts into Apply
+		ArrayList<String> collegeApplications = new ArrayList<String>();
+		Statement myStmt = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			myStmt = conn.createStatement();
+			String sql = "SELECT college.cName, major, accept FROM apply LEFT OUTER JOIN college ON " +
+					"apply.cName = college.cName WHERE apply.sID = '" +  sID + "'";
+			ResultSet s = myStmt.executeQuery(sql);
+			while (s.next()) {
+				String accepted = "Accepted";
+				if(s.getString(3).equals("0"))
+					accepted = "Not Accepted";
+				collegeApplications.add(s.getString(1) + "		" + s.getString(2) + "		" + accepted);
+			}   
+		} 
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(myStmt != null)
+			{
+				try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+
+		return collegeApplications;
+	}
+
+	/**
+	 * Applies the current student to the selected major at the selected college
+	 * @param sID
+	 * @param college
+	 * @param major
+	 * @return
+	 */
+	public int apply(int sID, String college, String major){
+
+		//Create a query that inserts into Apply
+		int retVal = 0;
+		Statement myStmt = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			myStmt = conn.createStatement();
+			String sql = "SELECT cName, major, accept " +
+					"FROM Apply a "+
+					"WHERE a.sID = '" +  sID + "' AND a.cName = '"  +  college + "' AND a.major = '"  + major + "'" ; 
+			ResultSet s = myStmt.executeQuery(sql);
+			if(!s.next()){
 				//CHANGE TO SQL
-				String sql = "DELETE FROM Apply WHERE sID = "+ sID + " AND cName = '"+ cName + "' AND major = '"+ major + "';";			
-				 myStmt.executeUpdate(sql);
-			} catch(SQLException e)
-			{
-				e.printStackTrace();
+				sql = "INSERT INTO APPLY(sID, cName, major) " +
+						"VALUES (" + sID +", '" + college +"', '" + major + "');"; 
+
+				retVal = myStmt.executeUpdate(sql);
 			}
-			finally
-			{
-				if(conn != null)
-				{
-					try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-				if(myStmt != null)
-				{
-					try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-			}
+
+		} catch(SQLException e)
+		{
+			e.printStackTrace();
 		}
-		/**
-		 * gets all the college applications for a student
-		 * @param sID
-		 * @return
-		 */
-		public ArrayList<String> getCollegeApplications(int sID){
-			//Create a query that inserts into Apply
-			ArrayList<String> collegeApplications = new ArrayList<String>();
-			Statement myStmt = null;
-			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-				myStmt = conn.createStatement();
-				String sql = "SELECT college.cName, major, accept FROM apply LEFT OUTER JOIN college ON " +
-	                  	 "apply.cName = college.cName WHERE apply.sID = '" +  sID + "'";
-				ResultSet s = myStmt.executeQuery(sql);
-				while (s.next()) {
-					String accepted = "Accepted";
-					if(s.getString(3).equals("0"))
-						accepted = "Not Accepted";
-				    collegeApplications.add(s.getString(1) + "		" + s.getString(2) + "		" + accepted);
-				}   
-			} 
-			catch(SQLException e)
+		finally
+		{
+			if(conn != null)
 			{
-				e.printStackTrace();
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
 			}
-			finally
+			if(myStmt != null)
 			{
-				if(conn != null)
-				{
-					try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-				if(myStmt != null)
-				{
-					try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
-				}
+				try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
 			}
-			
-			return collegeApplications;
-		}
-		
-		//Create a method that applies for a specific major in a college
-		public int apply(int sID, String college, String major){
-			//Create a query that inserts into Apply
-			int retVal = 0;
-			Statement myStmt = null;
-			try {
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-				myStmt = conn.createStatement();
-				String sql = "SELECT cName, major, accept " +
-	                  	 "FROM Apply a "+
-	                  	 "WHERE a.sID = '" +  sID + "' AND a.cName = '"  +  college + "' AND a.major = '"  + major + "'" ; 
-				ResultSet s = myStmt.executeQuery(sql);
-				if(!s.next()){
-					//CHANGE TO SQL
-					sql = "INSERT INTO APPLY(sID, cName, major) " +
-		                  	 "VALUES (" + sID +", '" + college +"', '" + major + "');"; 
-					
-					retVal = myStmt.executeUpdate(sql);
-				}
-				
-			} catch(SQLException e)
-			{
-				e.printStackTrace();
-			}
-			finally
-			{
-				if(conn != null)
-				{
-					try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-				if(myStmt != null)
-				{
-					try {myStmt.close();} catch (SQLException e) {e.printStackTrace();}
-				}
-			}
-			
-			return retVal;
 		}
 
-	public String getMinimumGPA(String college, String major) throws SQLException
+		return retVal;
+	}
+	
+	/**
+	 * Gets the GPA requirement for the selected major
+	 * @param college
+	 * @param major
+	 * @return
+	 * @throws SQLException
+	 */
+	public String getMinimumGPA(String college, String major) throws SQLException 
 	{
 		String sql = null;
 		ResultSet rs = null;
@@ -834,7 +880,7 @@ public class MySQLConnect {
 			preparedStatement.setString(1, college);
 			preparedStatement.setString(2, major);
 			rs = preparedStatement.executeQuery();
-			
+
 			if (rs.next()) {
 				gpa = rs.getString("GPAREQ");
 			}
@@ -856,5 +902,44 @@ public class MySQLConnect {
 		}
 		return gpa;
 	}
+	/**
+	 * Archives applications older than the selected date and returns how many applications were archived
+	 * @param date
+	 */
+	public int archiveApplications(Date date)
+	{
+		String insertStoreProc = "{call archiveApplications(?, ?)}";
+		CallableStatement callableStatement = null;
+		int numberArchived = 0;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			callableStatement = conn.prepareCall(insertStoreProc);
+			callableStatement.setDate(1, date);
+			callableStatement.registerOutParameter(2, Types.INTEGER);
+		    boolean hadResults = callableStatement.execute();
+		    while (hadResults) {
+		        ResultSet rs = callableStatement.getResultSet();
+		        hadResults = callableStatement.getMoreResults();
+		    }
+			numberArchived = callableStatement.getInt(2);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+			if(callableStatement != null)
+			{
+				try {callableStatement.close();} catch (SQLException e) {e.printStackTrace();}
+			}
+		}
+		return numberArchived;
 		
+
+	}
 }
