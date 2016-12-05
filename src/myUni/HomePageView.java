@@ -91,7 +91,7 @@ public class HomePageView extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int numberOfApplicationsArchived = theModel.archiveApplications(new java.sql.Date(((Date) model1.getValue()).getTime()));
+				int numberOfApplicationsArchived = theModel.archiveApplications(new java.sql.Timestamp(((Date) model1.getValue()).getTime()));
 				  JOptionPane.showMessageDialog(containingFrame, numberOfApplicationsArchived + " old applications successfully archived");
 			}
 

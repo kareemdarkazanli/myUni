@@ -221,7 +221,7 @@ public class MySQLConnect {
 			System.out.println("DecEnrollment Trigger created successfully");
 			String dropProcedure = "DROP PROCEDURE IF EXISTS archiveApplications";
 			stmtDrop.execute(dropProcedure);
-			String archiveProcedure = "CREATE PROCEDURE archiveApplications(IN archiveByDate DATE, OUT numberOfApps INT) "
+			String archiveProcedure = "CREATE PROCEDURE archiveApplications(IN archiveByDate TIMESTAMP, OUT numberOfApps INT) "
 					+ "BEGIN "
 					+ "insert into Archive "
 					+ "(SELECT * "
@@ -1058,9 +1058,9 @@ public class MySQLConnect {
 	}
 	/**
 	 * Archives applications older than the selected date and returns how many applications were archived
-	 * @param date
+	 * @param timestamp
 	 */
-	public int archiveApplications(Date date)
+	public int archiveApplications(Timestamp timestamp)
 	{
 		String insertStoreProc = "{call archiveApplications(?, ?)}";
 		CallableStatement callableStatement = null;
@@ -1068,7 +1068,7 @@ public class MySQLConnect {
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 			callableStatement = conn.prepareCall(insertStoreProc);
-			callableStatement.setDate(1, date);
+			callableStatement.setTimestamp(1, timestamp);
 			callableStatement.registerOutParameter(2, Types.INTEGER);
 		    boolean hadResults = callableStatement.execute();
 		    while (hadResults) {
