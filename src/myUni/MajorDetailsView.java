@@ -1,4 +1,4 @@
-package myUni;
+//package myUni;
 
 public class MajorDetailsView {
 	
