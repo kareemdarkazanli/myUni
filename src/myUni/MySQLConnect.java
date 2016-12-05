@@ -15,7 +15,7 @@ public class MySQLConnect {
 
 	//  Database credentials
 	static final String USER = "root";
-	static final String PASS = ""; //enter your root password here...
+	static final String PASS = "81640041Kd"; //enter your root password here...
 	private static Connection conn = null;
 	private static Statement statement = null;
 	private static PreparedStatement preparedStatement = null;
@@ -313,7 +313,7 @@ public class MySQLConnect {
 		ResultSet rs = null;
 		int count = 0;
 		try{
-
+			
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
 
 			sql = "SELECT count(*) from student WHERE password = ? GROUP BY sName having sName = ?";
