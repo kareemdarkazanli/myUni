@@ -14,7 +14,7 @@ SJSU	SE	3.5
 SJSU	Art	3.0
 SFSU	CS	3.4
 SFSU	EE	3.5
-SFSU	Physics
+SFSU	Physics	3.0
 SFSU	Communications	2.8
 SFSU	Marketing	3.0
 SFSU	Math	3.2
