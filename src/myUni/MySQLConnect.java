@@ -224,7 +224,7 @@ public class MySQLConnect {
 			String archiveProcedure = "CREATE PROCEDURE archiveApplications(IN archiveByDate DATE, OUT numberOfApps INT) "
 					+ "BEGIN "
 					+ "insert into Archive "
-					+ "(SELECT *"
+					+ "(SELECT * "
 					+ "FROM Apply "
 					+ "WHERE updatedAt < archiveByDate "
 					+ "); "
