@@ -3,6 +3,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+
 /**
  * Sets up the SQL connection and supplies various methods to fetch data from the database
  * code template modified from JDBCCallableStatement class example
@@ -885,7 +890,7 @@ public class MySQLConnect {
 	 * Archives applications older than the selected date and returns how many applications were archived
 	 * @param timestamp
 	 */
-	public int archiveApplications(Timestamp timestamp)
+	public int archiveApplications(JFrame containingFrame, Timestamp timestamp)
 	{
 		String insertStoreProc = "{call archiveApplications(?, ?)}";
 		CallableStatement callableStatement = null;
@@ -908,7 +913,13 @@ public class MySQLConnect {
 		    }
 			numberArchived = callableStatement.getInt(2);
 
-		} catch (SQLException e) {
+		}
+		catch(MySQLIntegrityConstraintViolationException error){
+			  JOptionPane.showMessageDialog(containingFrame, "Error: " + error.getMessage() +". \n"
+			  		+ "This application has already been archived. Please delete this application and try again.");
+		}
+		catch (SQLException e) {
+		
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
