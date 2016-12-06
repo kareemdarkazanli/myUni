@@ -1,4 +1,4 @@
-package myUni;
+//package myUni;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -11,295 +11,16 @@ import java.util.Vector;
 public class MySQLConnect {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	static final String DB_URL = "jdbc:mysql:///127.0.0.1/";
+	static final String DB_URL = "jdbc:mysql://localhost:3306/ApplyToCollege";
 
 	//  Database credentials
 	static final String USER = "root";
-	static final String PASS = "81640041Kd"; //enter your root password here...
+	static final String PASS = ""; //enter your root password here...
 	private static Connection conn = null;
 	private static Statement statement = null;
 	private static PreparedStatement preparedStatement = null;
 
-	/**
-	 * Creates the database
-	 * @throws SQLException
-	 */
-	private static void createDatabase() 
-	{
 
-		// Open a connection
-		System.out.println("Connecting to database...");
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-			String queryDrop = "DROP SCHEMA IF EXISTS ApplyToCollege";
-			Statement stmtDrop = conn.createStatement();
-			stmtDrop.execute(queryDrop);
-
-
-
-			// Create the database
-			System.out.println("Creating database...");
-			statement = conn.createStatement();
-
-			String sql = "CREATE SCHEMA ApplyToCollege";
-			statement.executeUpdate(sql);
-			System.out.println("Database created successfully...");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(conn != null)
-			{
-				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-			}
-			if(statement != null)
-			{
-				try {statement.close();} catch (SQLException e) {e.printStackTrace();}
-			}
-		}
-	}
-	/**
-	 * Populates the database with college, major, professor, and student tables
-	 * @throws SQLException
-	 */
-	private static void createTables() 
-	{
-		// Open a connection and select the database 
-		try {
-			System.out.println("Connecting to database...");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-			statement = conn.createStatement();
-
-			String queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.College";
-			Statement stmtDrop = conn.createStatement();
-			stmtDrop.execute(queryDrop);
-
-
-			String createTableSQL = "CREATE TABLE `ApplyToCollege`.`College` (" 
-					+"`cName` VARCHAR(30) NOT NULL," 
-					+"`state` VARCHAR(30),"
-					+ " `enrollment` INT," +
-					"PRIMARY KEY (`cName`))";
-
-			statement.execute(createTableSQL); 
-			System.out.println("Table called College created successfully...");
-
-
-			queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.Student";
-			stmtDrop.execute(queryDrop);
-
-			createTableSQL = "CREATE TABLE `ApplyToCollege`.`Student` (" 
-					+ " `sID` INT NOT NULL AUTO_INCREMENT,"
-					+ "`password` VARCHAR(30),"
-					+ "`sName` VARCHAR(30) UNIQUE,"
-					+ "`GPA` FLOAT,"
-					+ "PRIMARY KEY (`sID`))";
-			statement.execute(createTableSQL);
-			String alterSQL = "ALTER TABLE student AUTO_INCREMENT = 1000";
-			PreparedStatement pState = conn.prepareStatement(alterSQL);
-			pState.executeUpdate();
-			System.out.println("Table called Student created successfully...");
-
-			queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.Major";
-			stmtDrop.execute(queryDrop);
-
-			createTableSQL = "CREATE TABLE `ApplyToCollege`.`Major` (" 
-					+ "`cName` VARCHAR(30) NOT NULL,"
-					+ "`major` VARCHAR(30) NOT NULL,"
-					+ "`GPAREQ` FLOAT,"
-					+ "PRIMARY KEY (`cName`,`major`),"
-					+ "FOREIGN KEY cName_foreign_key(cName) REFERENCES `ApplyToCollege`.`College` (cName) ON DELETE CASCADE ON UPDATE CASCADE)";
-			statement.execute(createTableSQL); 
-			System.out.println("Table called Major created successfully...");
-
-			queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.Professor";
-			stmtDrop.execute(queryDrop);
-
-			createTableSQL = "CREATE TABLE `ApplyToCollege`.`Professor` (" 
-					+ "`cName` VARCHAR(30) NOT NULL, "
-					+ "`pName` VARCHAR(30), "
-					+ "`major` VARCHAR(30) NOT NULL, "
-					+ "`pID` INT NOT NULL AUTO_INCREMENT, "
-					+ "PRIMARY KEY (`pID`), "
-					+ "FOREIGN KEY major_foreign_key(cName, major) "
-					+ "REFERENCES `ApplyToCollege`.`Major` (cName, major) "
-					+ "ON DELETE CASCADE ON UPDATE CASCADE)";
-			statement.execute(createTableSQL); 
-			alterSQL = "ALTER TABLE professor AUTO_INCREMENT = 2000";
-			pState = conn.prepareStatement(alterSQL);
-			pState.executeUpdate();
-			System.out.println("Table called Professor created successfully...");
-
-			queryDrop = "DROP TABLE IF EXISTS ApplyToCollege.Apply";
-			stmtDrop.execute(queryDrop);
-			//Apply table has archiving feature
-			createTableSQL = "CREATE TABLE `ApplyToCollege`.`Apply` (" 
-					+ "`sID` INT NOT NULL,"
-					+ "`cName` VARCHAR(30), "
-					+ "`major` VARCHAR(30), "
-					+ "`accept` BOOLEAN, "
-					+ "updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
-					+ "PRIMARY KEY (`sID`,`cName`,`major`),"
-					+ "FOREIGN KEY sID_foreign_key(sID) REFERENCES `ApplyToCollege`.`Student` (sID) ON DELETE CASCADE ON UPDATE CASCADE,"
-					+ "FOREIGN KEY cName_foreign_key(cName, major) REFERENCES `ApplyToCollege`.`Major` (cName, major) ON DELETE CASCADE ON UPDATE CASCADE)";
-			
-			
-			statement.execute(createTableSQL); 
-			System.out.println("Table called Apply created successfully...");
-			
-			createTableSQL = "CREATE TABLE `ApplyToCollege`.`Archive` (" 
-					+ "`sID` INT NOT NULL,"
-					+ "`cName` VARCHAR(30), "
-					+ "`major` VARCHAR(30), "
-					+ "`accept` BOOLEAN, "
-					+ "updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
-					+ "PRIMARY KEY (`sID`,`cName`,`major`),"
-					+ "FOREIGN KEY sID_foreign_key(sID) REFERENCES `ApplyToCollege`.`Student` (sID) ON DELETE CASCADE ON UPDATE CASCADE,"
-					+ "FOREIGN KEY cName_foreign_key(cName, major) REFERENCES `ApplyToCollege`.`Major` (cName, major) ON DELETE CASCADE ON UPDATE CASCADE)";
-			statement.execute(createTableSQL); 
-			System.out.println("Table called Archive created successfully...");
-
-			String dropTrigger = "DROP TRIGGER IF EXISTS acceptance";
-			stmtDrop.execute(dropTrigger);
-			String acceptTrigger = "CREATE TRIGGER acceptance "
-					+ "BEFORE INSERT ON Apply "
-					+ "FOR EACH ROW "
-					+ "BEGIN "
-					+ "IF ( (select gpa from student where student.sID = NEW.sID) "
-					+ "    >= (select GPAREQ from major "
-					+ "where major.cName = NEW.cName "
-					+ "AND major.major = NEW.major "
-					+ "        ) "
-					+ "    ) "
-					+ "THEN "
-					+ "set NEW.accept = TRUE; "
-					+ "ELSE "
-					+ "set NEW.accept = FALSE; "
-					+ "END IF; "
-					+ "END; ";
-
-			pState = conn.prepareStatement(acceptTrigger);
-			pState.executeUpdate();
-			System.out.println("Accept trigger created successfully");
-
-			String incEnrollment = "CREATE TRIGGER incEnrollment "
-					+ "AFTER INSERT ON Apply "
-					+ "FOR EACH ROW "
-					+ "BEGIN "
-					+ "IF (NEW.accept = TRUE ) "
-					+ "THEN "
-					+ "UPDATE College "
-					+ "SET enrollment = enrollment + 1 "
-					+ "WHERE College.cName = NEW.cName; "
-					+ "END IF; "
-					+ "END; ";
-
-			pState = conn.prepareStatement(incEnrollment);
-			pState.executeUpdate();
-			System.out.println("IncEnrollment Trigger created successfully");
-
-			String decEnrollment = "CREATE TRIGGER decEnrollment "
-					+ "AFTER DELETE ON Apply "
-					+ "FOR EACH ROW "
-					+ "BEGIN "
-					+ "IF (OLD.accept = TRUE ) "
-					+ "THEN "
-					+ "UPDATE College "
-					+ "SET enrollment = enrollment - 1 "
-					+ "WHERE College.cName = OLD.cName; "
-					+ "END IF; "
-					+ "END; ";
-
-			pState = conn.prepareStatement(decEnrollment);
-			pState.executeUpdate();
-			System.out.println("DecEnrollment Trigger created successfully");
-			String dropProcedure = "DROP PROCEDURE IF EXISTS archiveApplications";
-			stmtDrop.execute(dropProcedure);
-			String archiveProcedure = "CREATE PROCEDURE archiveApplications(IN archiveByDate TIMESTAMP, OUT numberOfApps INT) "
-					+ "BEGIN "
-					+ "insert into Archive "
-					+ "(SELECT * "
-					+ "FROM Apply "
-					+ "WHERE updatedAt < archiveByDate "
-					+ "); "
-					+ " "
-					+ "select count(*) INTO numberOfApps from Apply where updatedAt < archiveByDate; "
-					+ " "
-					+ "delete from Apply " 
-					+ "where updatedAt < archiveByDate; "
-					+ "END; ";
-			pState = conn.prepareStatement(archiveProcedure);
-			pState.executeUpdate();
-			System.out.println("Archiving procedure created successfully");
-		}
-		catch(SQLException e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(conn != null)
-			{
-				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-			}
-			if(statement != null)
-			{
-				try {statement.close();} catch (SQLException e) {e.printStackTrace();}
-			}
-		}
-
-
-	}
-	/**
-	 * Loads the data from the text files into the database
-	 * @throws SQLException
-	 */
-	private static void loadDataIntoTables() throws SQLException
-	{
-		try{
-
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
-			statement = conn.createStatement();
-			System.out.println("Load data from a file colleges.txt");
-			String loadDataSQL = "LOAD DATA LOCAL INFILE 'colleges.txt' INTO TABLE COLLEGE";
-			statement.execute(loadDataSQL); 
-
-			System.out.println("Load data from a file students.txt");
-			loadDataSQL = "LOAD DATA LOCAL INFILE 'students.txt' INTO TABLE STUDENT (password, sName, GPA)";
-			statement.execute(loadDataSQL); 
-
-			System.out.println("Load data from a file majors.txt");
-			loadDataSQL = "LOAD DATA LOCAL INFILE 'majors.txt' INTO TABLE MAJOR";
-			statement.execute(loadDataSQL); 
-
-			System.out.println("Load data from a file professors.txt");
-			loadDataSQL = "LOAD DATA LOCAL INFILE 'professors.txt' INTO TABLE PROFESSOR (cName, pName, Major)";
-			statement.execute(loadDataSQL); 
-		}
-		catch(SQLException e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(conn != null)
-			{
-				try {conn.close();} catch (SQLException e) {e.printStackTrace();}
-			}
-			if(statement != null)
-			{
-				try {statement.close();} catch (SQLException e) {e.printStackTrace();}
-			}
-		}
-
-
-	}
 
 	/**
 	 * Checks if the input username and password are correct
@@ -312,9 +33,14 @@ public class MySQLConnect {
 		String sql = null;
 		ResultSet rs = null;
 		int count = 0;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try{
-			
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 
 			sql = "SELECT count(*) from student WHERE password = ? GROUP BY sName having sName = ?";
 			preparedStatement= conn.prepareStatement(sql);
@@ -358,9 +84,14 @@ public class MySQLConnect {
 		String sql = null;
 		ResultSet rs = null;
 		int sID = 0;
-
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			sql = "SELECT sID from student where sName = ? and password = ?";
 			preparedStatement = conn.prepareStatement(sql);
 			preparedStatement.setString(1, sName);
@@ -400,8 +131,14 @@ public class MySQLConnect {
 		String sql = null;
 		ResultSet rs = null;
 		String sName = "";
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 
 			sql = "SELECT sName from student where sID = ?";
 			preparedStatement= conn.prepareStatement(sql);
@@ -440,8 +177,14 @@ public class MySQLConnect {
 		String sql = null;
 		ResultSet rs = null;
 		String gpa = "";
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			sql = "SELECT GPAREQ from major JOIN college ON major.cName = college.cName WHERE college.cName = ? AND major = ?;";
 			preparedStatement= conn.prepareStatement(sql);
 			preparedStatement.setString(1, college);
@@ -477,9 +220,14 @@ public class MySQLConnect {
 	 */
 	public int getEnrollment(String college){
 		int enrollment = 0;
-
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			ResultSet rs;
 			String sql;
 
@@ -519,7 +267,13 @@ public class MySQLConnect {
 		Vector<String> professors = new Vector<>();
 		Statement myStmt = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			myStmt = conn.createStatement();
 			String sql = "SELECT pName FROM professor WHERE cName = '" +  college + "' AND major = '" + major + "'";
 			ResultSet s = myStmt.executeQuery(sql);
@@ -545,16 +299,6 @@ public class MySQLConnect {
 		return professors;
 	}
 
-	/**
-	 * Runs all the methods that prepare the database to create the database, tables, and to populate the tables with data
-	 * @throws SQLException
-	 */
-	public static void setUpData() throws SQLException
-	{
-		createDatabase();
-		createTables();
-		loadDataIntoTables();
-	}
 
 
 	/**
@@ -567,8 +311,21 @@ public class MySQLConnect {
 		String sql = null;
 		ResultSet rs = null;
 		boolean flag = false;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			sql = "SELECT sName from student";
 			preparedStatement = conn.prepareStatement(sql);
 			rs = preparedStatement.executeQuery();
@@ -605,8 +362,14 @@ public class MySQLConnect {
 	public void createNewAccount(String username, String password, String gpa) throws SQLException{
 		String sql = null;
 		ResultSet rs = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			sql = "INSERT INTO student(sname, password, GPA) VALUES (?,?,?)";
 			preparedStatement= conn.prepareStatement(sql);
 			preparedStatement.setString(1, username);
@@ -640,9 +403,14 @@ public class MySQLConnect {
 		//Create query that gets all states
 		ArrayList<String> states = new ArrayList<String>();
 		Statement myStmt = null;
-
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			myStmt = conn.createStatement();
 
 			String sql = "SELECT state " +
@@ -682,8 +450,14 @@ public class MySQLConnect {
 	public void updateAccountInfo(int sID, String username, String password, Float gpa) throws SQLException{
 		String sql = null;
 		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try{
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			sql = "UPDATE student SET sName = '" + username + "' , password = '" + password + "' , GPA = '" + gpa + "' WHERE sID = '" + sID + "';";
 			stmt = conn.createStatement();
 			stmt.executeUpdate(sql);
@@ -713,9 +487,14 @@ public class MySQLConnect {
 	 */
 	public String getPassword(int sID){
 		String password = "";
-
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			ResultSet rs;
 			String sql;
 
@@ -753,9 +532,14 @@ public class MySQLConnect {
 	 */
 	public String getName(int sID){
 		String name = "";
-
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			ResultSet rs;
 			String sql;
 
@@ -793,9 +577,14 @@ public class MySQLConnect {
 	 */
 	public float getGPA(int sID){
 		float gpa = 0;
-
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			ResultSet rs;
 			String sql;
 
@@ -835,7 +624,13 @@ public class MySQLConnect {
 		ArrayList<String> colleges = new ArrayList<String>();
 		Statement myStmt = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			myStmt = conn.createStatement();
 			String sql = "SELECT cName " +
 					"FROM College c "+
@@ -874,7 +669,13 @@ public class MySQLConnect {
 		ArrayList<String> majors = new ArrayList<String>();
 		Statement myStmt = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			myStmt = conn.createStatement();
 			String sql = "SELECT DISTINCT major " +
 					"FROM Major m "+
@@ -906,7 +707,13 @@ public class MySQLConnect {
 		//Create a query that inserts into Apply
 		Statement myStmt = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			myStmt = conn.createStatement();
 
 			//CHANGE TO SQL
@@ -938,7 +745,13 @@ public class MySQLConnect {
 		ArrayList<String> collegeApplications = new ArrayList<String>();
 		Statement myStmt = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			myStmt = conn.createStatement();
 			String sql = "SELECT college.cName, major, accept FROM apply LEFT OUTER JOIN college ON " +
 					"apply.cName = college.cName WHERE apply.sID = '" +  sID + "'";
@@ -982,7 +795,13 @@ public class MySQLConnect {
 		int retVal = 0;
 		Statement myStmt = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			myStmt = conn.createStatement();
 			String sql = "SELECT cName, major, accept " +
 					"FROM Apply a "+
@@ -1028,7 +847,13 @@ public class MySQLConnect {
 		ResultSet rs = null;
 		String gpa = "";
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			sql = "SELECT GPAREQ from major JOIN college ON major.cName = college.cName WHERE college.cName = ? AND major = ?;";
 			preparedStatement= conn.prepareStatement(sql);
 			preparedStatement.setString(1, college);
@@ -1066,7 +891,13 @@ public class MySQLConnect {
 		CallableStatement callableStatement = null;
 		int numberArchived = 0;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ApplyToCollege", USER, PASS);
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			callableStatement = conn.prepareCall(insertStoreProc);
 			callableStatement.setTimestamp(1, timestamp);
 			callableStatement.registerOutParameter(2, Types.INTEGER);
